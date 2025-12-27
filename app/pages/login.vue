@@ -30,13 +30,13 @@ const fields: AuthFormField[] = [{
     name        : "email",
     type        : "email",
     label       : "Email",
-    placeholder : "Enter your email",
+    placeholder : "Masukkan email",
     required    : true,
 }, {
     name        : "password",
     label       : "Password",
     type        : "password",
-    placeholder : "Enter your password",
+    placeholder : "Masukkan password",
     required    : true,
 }]
 
