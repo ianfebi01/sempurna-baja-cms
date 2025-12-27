@@ -41,8 +41,8 @@ const fields: AuthFormField[] = [{
 }]
 
 const schema = z.object( {
-    email    : z.email( "Invalid email" ),
-    password : z.string( "Password is required" ).min( 8, "Must be at least 8 characters" ),
+    email    : z.email( "Email tidak valid" ),
+    password : z.string( "Password tidak boleh kosong" ).min( 8, "Password minimal 8 karakter" ),
 } )
 
 type Schema = z.output<typeof schema>
