@@ -5,6 +5,7 @@
     description="Masuk ke akun Anda"
     icon="i-lucide-user"
     :fields="fields"
+    :loading="loading"
     @submit="onSubmit">
     <template #description>
       Belum punya akun? <ULink to="/register" class="text-primary font-medium">Daftar</ULink>.
@@ -25,7 +26,7 @@ definePageMeta( {
 
 const toast = useToast()
 const router = useRouter()
-
+const loading = ref( false )
 const fields: AuthFormField[] = [{
     name        : "email",
     type        : "email",
@@ -48,8 +49,10 @@ const schema = z.object( {
 type Schema = z.output<typeof schema>
 
 async function onSubmit( payload: FormSubmitEvent<Schema> ) {
+    loading.value = true
     const loginForm = payload.data
     await login( loginForm )
+    loading.value = false
 }
 
 const { me } = useAuth()
