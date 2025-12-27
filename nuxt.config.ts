@@ -60,7 +60,7 @@ export default defineNuxtConfig( {
   },
   site: {
     url       : resolveSiteUrl(),
-    indexable : process.env.NODE_ENV === "production",
+    indexable : false,
   },
   nitro: {
     preset    : process.env.VERCEL ? "vercel" : "static",
