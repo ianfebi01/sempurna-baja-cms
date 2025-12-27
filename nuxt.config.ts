@@ -1,71 +1,85 @@
-import products from "./app/assets/json/products.json"
+// Helper to resolve site URL for production/preview/dev
+function resolveSiteUrl () {
+  const env = process.env.VERCEL_ENV
+  const custom = process.env.NUXT_SITE_URL
+  const previewHost = process.env.VERCEL_URL
+  const dev = process.env.NUXT_DEV_URL
+  const isVercel = !!process.env.VERCEL
+
+  // Production: use custom domain
+  if ( env === "production" ) return custom
+
+  // Preview: prefer Vercel preview URL, fallback to custom if provided
+  if ( env === "preview" ) return previewHost ? `https://${previewHost}` : ( custom || "http://localhost:3000" )
+
+  // Vercel dev (env may be undefined): prefer preview host if available
+  if ( isVercel && previewHost ) return `https://${previewHost}`
+
+  // Local dev: use custom/dev override or localhost
+  return custom || dev || "http://localhost:3000"
+}
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig( {
   compatibilityDate : "2025-07-15",
   devtools          : { enabled: true },
+  ssr               : true,
+  css               : ["./app/assets/css/main.css"],
   runtimeConfig     : {
     public: {
-      siteName: process.env.NUXT_SITE_NAME,
-      siteUrl:
-        process.env.VERCEL_ENV === "production"
-          ? process.env.NUXT_SITE_URL // your custom domain, e.g. https://mysite.com
-          : process.env.VERCEL_ENV === "preview"
-            ? `https://${process.env.VERCEL_URL}` // Vercel preview deployments
-            : process.env.NUXT_SITE_URL || "http://localhost:3000", // local or vercel dev,
+      siteName : process.env.NUXT_SITE_NAME,
+      siteUrl  : resolveSiteUrl(),
+    },
+    auth: {
+      mongo: {
+        secret  : process.env.JWT_SECRET as string,
+        exclude : [],
+      },
+    },
+    mongo: {
+      uri     : process.env.MONGODB_URI,
+      dbName  : process.env.MONGODB_DB_NAME,
+      appName : process.env.MONGODB_DB_NAME,
     },
   },
   modules: [
     "@nuxt/eslint",
-    "@nuxtjs/tailwindcss",
     "@nuxtjs/sitemap",
     "@nuxtjs/robots",
     "@nuxt/icon",
     "@nuxt/image",
+    "@nuxt/ui",
   ],
   eslint: {
     checker: true,
   },
-  tailwindcss: {
-    exposeConfig: true,
-  },
-  css     : ["@/assets/css/main.css"],
-  postcss : {
+  postcss: {
     plugins: {
-      "postcss-import"      : {},
-      "tailwindcss/nesting" : {},
-      tailwindcss           : {},
-      autoprefixer          : {},
+      "@tailwindcss/postcss": {},
     },
   },
   site: {
-    url:
-      process.env.VERCEL_ENV === "production"
-        ? process.env.NUXT_SITE_URL // your custom domain, e.g. https://mysite.com
-        : process.env.VERCEL_ENV === "preview"
-          ? `https://${process.env.VERCEL_URL}` // Vercel preview deployments
-          : process.env.NUXT_SITE_URL || "http://localhost:3000", // local or vercel dev,
-    indexable: process.env.NODE_ENV === "production",
+    url       : resolveSiteUrl(),
+    indexable : process.env.NODE_ENV === "production",
   },
   nitro: {
     preset    : process.env.VERCEL ? "vercel" : "static",
     prerender : {
-      routes: [
-        "/",
-        "/products",
-      ],
+      // routes: [
+      //   "/",
+      // ],
       failOnError: true,
     },
   },
-  hooks: {
-    "nitro:config": async ( nitroConfig ) => {
-      if ( nitroConfig.dev ) {
-        return
-      }
+  // hooks: {
+  //   "nitro:config": async ( nitroConfig ) => {
+  //     if ( nitroConfig.dev ) {
+  //       return
+  //     }
 
-      products.forEach( ( item ) => nitroConfig?.prerender?.routes?.push( `/products/${item.slug}` ) )
-    },
-  },
+  //     products.forEach( ( item ) => nitroConfig?.prerender?.routes?.push( `/products/${item.slug}` ) )
+  //   },
+  // },
   router: {
     options: {
       scrollBehaviorType: "smooth",
@@ -74,4 +88,7 @@ export default defineNuxtConfig( {
   plugins: [
     "~/plugins/ValidateSlug.ts",
   ],
+  ui: {
+    colorMode: false,
+  },
 } )

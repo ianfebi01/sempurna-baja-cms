@@ -1,11 +1,33 @@
 export type Product = {
-  id: number
+  _id: ObjectId
   image: string
   name: string
   slug: string
   description: string
-  category: string
+  category: ObjectId
   price: number
   unit: string
-  brand: string
+  brand: ObjectId
+}
+
+export type ProductResponse = {
+  data: Product[]
+  meta: {
+    page: number
+    pageSize: number
+    total: number
+    totalPages: number
+  }
+}
+
+export type Category = {
+  _id: ObjectId
+  name: string
+  slug: string
+}
+
+export type Brand = {
+  _id: ObjectId
+  name: string
+  slug: string
 }

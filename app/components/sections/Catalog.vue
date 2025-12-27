@@ -20,10 +20,11 @@
 </template>
 
 <script lang="ts" setup>
-import products from "@/assets/json/products.json"
-import ProductCard from "../ProductCard.vue"
+import type { ApiSuccess } from "~~/shared/types"
 
-toRaw( products )
+const { data: uniqueCategoryData } = await useAsyncData<ApiSuccess<ProductResponse>>( "unique-category-products-home", () => $fetch( "/api/products/unique-category" ) )
+
+const uniqueCategoryProducts = computed( () => uniqueCategoryData.value?.data?.data || [] )
 
 /**
  * Transition
@@ -75,14 +76,4 @@ onBeforeUnmount( () => {
 /**
  * End Transition
  */
-
-const uniqueCategoryProducts = computed( () => {
-  const map = new Map()
-  for ( const product of products ) {
-    if ( !map.has( product.category ) ) {
-      map.set( product.category, product )
-    }
-  }
-  return Array.from( map.values() ).slice( 0, 3 )
-} )
 </script>

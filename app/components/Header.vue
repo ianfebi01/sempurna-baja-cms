@@ -6,8 +6,7 @@
     <NuxtLink
       to="/products"
       class="no-underline text-black font-extralight transition-default"
-      exact-active-class="!font-bold"
-      @click="scrollToSection('katalog')">
+      exact-active-class="!font-bold">
       Produk
     </NuxtLink>
     <div class="grow"></div>

@@ -1,33 +1,33 @@
 @layer components {
   /* BUTTONS */
   .button {
-    @apply py-2 px-4 text-base flex items-center gap-2 rounded-lg border border-transparent transition-default w-fit hover:border-white/25 group-hover:border-white/25 no-underline hover:shadow-2xl group-hover:shadow-2xl;
+    @apply py-2 px-4 text-base flex items-center gap-2 rounded-lg border border-transparent transition-all duration-300 ease-in-out w-fit hover:border-white/25 group-hover:border-white/25 no-underline hover:shadow-2xl group-hover:shadow-2xl cursor-pointer disabled:cursor-default;
 
-    &-primary {
+    &.button-primary {
       @apply bg-black text-white;
     }
 
-    &-secondary {
+    &.button-secondary {
       @apply bg-gray-100 text-black;
     }
 
-    &-icon {
+    &.button-icon {
       @apply w-8 aspect-square p-2 flex items-center justify-center text-white border hover:border-white/25 group-hover:border-white/25 border-transparent bg-transparent;
     }
 
-    &-icon-only {
+    &.button-icon-only {
       @apply w-fit p-0 hover:opacity-75 group-hover:opacity-75 focus:opacity-75 text-white border-none;
     }
 
-    &-link {
+    &.button-link {
       @apply w-fit p-0 hover:opacity-75 group-hover:opacity-75 focus:opacity-75 text-white border-none;
     }
 
-    &-disabled {
+    &.button-disabled {
       @apply opacity-50 text-white/50 hover:border-transparent group-hover:border-transparent;
     }
 
-    &-error {
+    &.button-error {
       @apply text-white border hover:border-red-400 group-hover:border-red-400 border-red-500 bg-transparent;
     }
   }
