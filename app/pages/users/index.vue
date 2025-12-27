@@ -124,7 +124,7 @@ import z from "zod"
 import { RoleEnum } from "~~/server/models/allowlist.schema"
 
 definePageMeta( {
-    layout     : "admin",
+    layout     : "default",
     middleware : "auth",
 } )
 

@@ -61,7 +61,7 @@ async function register( registerForm: Schema ) {
         if ( data.registered ) {
             await me()
             emit( "onRegister", data.user )
-            router.replace( "/admin" )
+            router.replace( "/" )
             toast.add( {
                 title       : "Berhasil Membuat Akun",
                 icon        : "i-ph-sign-in",

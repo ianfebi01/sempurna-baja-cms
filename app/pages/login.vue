@@ -70,7 +70,7 @@ async function login( loginForm: Schema ) {
                 icon        : "i-ph-sign-in",
                 description : `${data.data.user} berhasil masuk.`,
             } )
-            router.replace( "/admin" )
+            router.replace( "/" )
         } else {
             // ApiError shape
             toast.add( {

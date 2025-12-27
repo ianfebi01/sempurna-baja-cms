@@ -5,7 +5,7 @@ import type { Category, Product } from "~~/shared/types/product"
 import type { ApiError, ApiSuccess } from "~~/shared/types"
 
 definePageMeta( {
-  layout     : "admin",
+  layout     : "default",
   middleware : "auth",
 } )
 
@@ -151,7 +151,7 @@ async function onSubmit( event: FormSubmitEvent<Schema> ) {
     toast.add( { title: "Sukses", description: `Sukses mengubah produk ${event.data.name}`, color: "success" } )
     open.value = false
     isLoading.value = false
-    router.push( "/admin" )
+    router.push( "/" )
   } catch ( error: unknown ) {
     let err: ApiError
     if ( typeof error === "object" && error !== null && "data" in error ) {
@@ -323,7 +323,7 @@ const brandItems = computed( () => {
               color="primary"
               variant="subtle"
               :disabled="isLoading"
-              to="/admin" />
+              to="/" />
             <UButton
               label="Edit Produk"
               color="neutral"

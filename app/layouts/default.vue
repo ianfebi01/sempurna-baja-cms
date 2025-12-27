@@ -12,7 +12,7 @@ const items = computed<NavigationMenuItem[][]>( () => {
     {
       label : "Produk",
       icon  : "fa7-solid:bag-shopping",
-      href  : "/admin",
+      href  : "/",
     },
   ]
 
@@ -20,7 +20,7 @@ const items = computed<NavigationMenuItem[][]>( () => {
     group.push( {
       label : "Kelola Pengguna",
       icon  : "fa7-solid:users-cog",
-      href  : "/admin/users",
+      href  : "/users",
     } )
   }
 
@@ -48,7 +48,7 @@ const profileDropdownItems = [
       icon     : "i-ph-sign-out",
       onSelect : async () => {
         await clear()
-        router.replace( { path: "/" } )
+        router.replace( { path: "/login" } )
         toast.add( {
           color       : "error",
           title       : "Keluar!",

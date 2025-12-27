@@ -6,9 +6,9 @@ export default defineNuxtRouteMiddleware( ( to ) => {
 
   // Redirect logged-in users away from login/register
   if ( authPages.includes( to.path ) && loggedIn.value )
-    return navigateTo( "/admin" )
+    return navigateTo( "/" )
 
-  // Redirect guests away from protected routes like /admin
-  if ( !loggedIn.value && to.path.startsWith( "/admin" ) )
+  // Redirect guests away from protected routes like /auth
+  if ( !loggedIn.value && !authPages.includes( to.path ) )
     return navigateTo( "/login" )
 } )

@@ -11,7 +11,7 @@
             label="Tambah Produk"
             icon="i-lucide-plus"
             color="neutral"
-            to="/admin/add-product" />
+            to="/add-product" />
         </template>
       </UDashboardNavbar>
     </template>
@@ -138,7 +138,7 @@ import type { ApiError, ApiSuccess } from "~~/shared/types"
 import { useDebounce } from "~/compossables/useDebounce"
 
 definePageMeta( {
-  layout     : "admin",
+  layout     : "default",
   middleware : "auth",
 } )
 
@@ -328,7 +328,7 @@ const columns: TableColumn<Product>[] = [
                   window.open( route.href, "_blank" )
                 },
               },
-              { label: "Edit", icon: "i-lucide-pencil", onSelect: () => router.push( `/admin/edit-product/${row.original._id}` ) },
+              { label: "Edit", icon: "i-lucide-pencil", onSelect: () => router.push( `/edit-product/${row.original._id}` ) },
               { label: "Delete", icon: "i-lucide-trash", onSelect: () => promptDeleteProduct( row.original ) },
             ],
           },
