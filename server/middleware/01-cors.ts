@@ -4,10 +4,15 @@ const allowedOrigins = [
   'https://sempurnabaja.com',
 ]
 
+// Check if origin is a Vercel domain (*.vercel.app)
+function isVercelDomain(origin: string): boolean {
+  return /^https:\/\/[\w-]+\.vercel\.app$/.test(origin)
+}
+
 export default defineEventHandler((event) => {
   const origin = getHeader(event, 'origin')
 
-  if (origin && allowedOrigins.includes(origin)) {
+  if (origin && (allowedOrigins.includes(origin) || isVercelDomain(origin))) {
     setHeader(event, 'Access-Control-Allow-Origin', origin)
     setHeader(event, 'Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
     setHeader(event, 'Access-Control-Allow-Headers', 'Content-Type, Authorization')
