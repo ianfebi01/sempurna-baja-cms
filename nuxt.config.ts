@@ -26,8 +26,8 @@ export default defineNuxtConfig( {
   ssr               : true,
   css               : ["./app/assets/css/main.css"],
   runtimeConfig     : {
-    deployHook: process.env.DEPLOY_HOOK,
-    public: {
+    deployHook : process.env.DEPLOY_HOOK,
+    public     : {
       siteName : process.env.NUXT_SITE_NAME,
       siteUrl  : resolveSiteUrl(),
     },

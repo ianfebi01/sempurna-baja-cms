@@ -7,6 +7,32 @@ const router = useRouter()
 const open = ref( false )
 const { loggedIn, user, clear } = useAuth()
 
+const isPublishing = ref( false )
+async function handlePublish() {
+  if ( isPublishing.value ) return
+
+  isPublishing.value = true
+  try {
+    await $fetch( "/api/deploy/trigger", { method: "POST" } )
+    toast.add( {
+      color       : "success",
+      title       : "Berhasil!",
+      icon        : "i-ph-rocket-launch",
+      description : "Website sedang di-deploy. Proses ini membutuhkan waktu beberapa menit.",
+    } )
+  } catch ( error ) {
+    console.error( error )
+    toast.add( {
+      color       : "error",
+      title       : "Gagal!",
+      icon        : "i-ph-warning",
+      description : "Gagal memicu deploy. Silakan coba lagi.",
+    } )
+  } finally {
+    isPublishing.value = false
+  }
+}
+
 const items = computed<NavigationMenuItem[][]>( () => {
   const group: NavigationMenuItem[] = [
     {
@@ -24,8 +50,17 @@ const items = computed<NavigationMenuItem[][]>( () => {
     } )
   }
 
-  return [ group ]
+  return [group]
 } )
+
+const secondaryItems = computed<NavigationMenuItem[]>( () => [
+  {
+    label    : isPublishing.value ? "Publishing..." : "Publish",
+    icon     : "i-ph-rocket-launch",
+    disabled : isPublishing.value,
+    onSelect : () => handlePublish(),
+  },
+] )
 
 const profileDropdownItems = [
   [
@@ -97,6 +132,12 @@ const profileDropdownItems = [
           </UButton> -->
 
           <UNavigationMenu :collapsed="collapsed" :items="items[0]" orientation="vertical" />
+
+          <UNavigationMenu
+            :collapsed="collapsed"
+            :items="secondaryItems"
+            orientation="vertical"
+            class="mt-auto" />
         </template>
 
         <template #footer="{ collapsed }">
