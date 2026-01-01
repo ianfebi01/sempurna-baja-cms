@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import type { NuxtError } from "#app"
 
-const props = defineProps({
+const props = defineProps( {
   error: Object as () => NuxtError,
-})
+} )
 
-console.log(props.error)
+console.log( props.error )
 </script>
 
 <template>
@@ -15,7 +15,9 @@ console.log(props.error)
       <div class="grow flex items-center justify-center relative">
         <div class="absolute inset-x-0 bottom-0 text-gray-100 z-[0]">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320">
-            <path fill="currentColor" fill-opacity="1"
+            <path
+              fill="currentColor"
+              fill-opacity="1"
               d="M0,64L120,58.7C240,53,480,43,720,48C960,53,1200,75,1320,85.3L1440,96L1440,320L1320,320C1200,320,960,320,720,320C480,320,240,320,120,320L0,320Z" />
           </svg>
         </div>
