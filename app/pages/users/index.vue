@@ -119,7 +119,6 @@
 import type { TableColumn } from "@nuxt/ui"
 import type { Role } from "#shared/types"
 import type { ApiSuccess } from "~~/shared/types"
-import { useAuth } from "~/compossables/useAuth"
 import z from "zod"
 import { RoleEnum } from "~~/server/models/allowlist.schema"
 
@@ -133,7 +132,7 @@ const UButton = resolveComponent( "UButton" )
 const toast = useToast()
 
 // Auth role
-const { user } = useAuth()
+const { user } = useUserSession()
 const isSuperAdmin = computed( () => user.value?.role === "super-admin" )
 
 // Fetch allowlist

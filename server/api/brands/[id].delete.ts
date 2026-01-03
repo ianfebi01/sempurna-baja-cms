@@ -3,8 +3,8 @@ import clientPromise, { DB_NAME } from "~~/server/lib/mongodb"
 import { ObjectId } from "mongodb"
 
 export default defineApi( async ( event ) => {
-  const me = await requireAuth( event )
-  const email = me?.email
+  const { user } = await requireUserSession(event)
+  const email = user?.email
   if ( !email ) return fail( 401, "Unauthorized", "UNAUTHORIZED" )
 
   const id = event.context.params?.id
