@@ -1,6 +1,6 @@
-import { RoleEnum } from "~~/server/models/allowlist.schema"
+import type { RoleEnum } from "~~/server/models/allowlist.schema"
 
-declare module '#auth-utils' {
+declare module "#auth-utils" {
   interface User {
     email: string
     role: RoleEnum

@@ -34,7 +34,7 @@ export default defineApi( async ( event ) => {
     }
   }
 
-  const { user } = await requireUserSession(event)
+  const { user } = await requireUserSession( event )
   const email = user?.email
   if ( !email ) return fail( 401, "Tidak diizinkan.", "UNAUTHORIZED" )
 

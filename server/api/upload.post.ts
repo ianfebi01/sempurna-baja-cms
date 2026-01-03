@@ -8,7 +8,7 @@ export default defineEventHandler( async ( event ) => {
         throw createError( { statusCode: 400, statusMessage: "Tidak ada file yang diunggah." } )
     }
 
-    const { user } = await requireUserSession(event)
+    const { user } = await requireUserSession( event )
     const email = user?.email
     if ( !email ) return fail( 401, "Tidak diizinkan.", "UNAUTHORIZED" )
 

@@ -45,13 +45,13 @@ export default defineNuxtConfig( {
     oauth: {
       // provider in lowercase (github, google, etc.)
       google: {
-        clientId: process.env.GOOGLE_CLIENT_ID,
-        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+        clientId     : process.env.GOOGLE_CLIENT_ID,
+        clientSecret : process.env.GOOGLE_CLIENT_SECRET,
       },
     },
   },
-  modules: ["@nuxt/eslint", "@nuxtjs/sitemap", "@nuxtjs/robots", "@nuxt/icon", "@nuxt/image", "@nuxt/ui", "nuxt-auth-utils"],
-  eslint: {
+  modules : ["@nuxt/eslint", "@nuxtjs/sitemap", "@nuxtjs/robots", "@nuxt/icon", "@nuxt/image", "@nuxt/ui", "nuxt-auth-utils"],
+  eslint  : {
     checker: true,
   },
   postcss: {

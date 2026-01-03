@@ -4,7 +4,7 @@ import { ObjectId } from "mongodb"
 
 export default defineApi( async ( event ) => {
   // Require auth
-  const { user } = await requireUserSession(event)
+  const { user } = await requireUserSession( event )
   const email = user?.email
   if ( !email ) return fail( 401, "Unauthorized", "UNAUTHORIZED" )
 
