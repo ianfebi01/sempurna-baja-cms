@@ -1,11 +1,10 @@
 <script setup lang="ts">
 import type { NavigationMenuItem } from "@nuxt/ui"
-import { useAuth } from "~/compossables/useAuth"
 
 const toast = useToast()
 const router = useRouter()
 const open = ref( false )
-const { loggedIn, user, clear } = useAuth()
+const { loggedIn, user, clear } = useUserSession()
 
 const isPublishing = ref( false )
 async function handlePublish() {
@@ -13,7 +12,7 @@ async function handlePublish() {
 
   isPublishing.value = true
   try {
-    await $fetch( "/api/deploy/trigger", { method: "POST" } )
+    await useNuxtApp().$api( "/api/deploy/trigger", { method: "POST" } )
     toast.add( {
       color       : "success",
       title       : "Berhasil!",
@@ -44,7 +43,7 @@ const items = computed<NavigationMenuItem[][]>( () => {
 
   if ( user.value?.role === "super-admin" ) {
     group.push( {
-      label : "Kelola Pengguna",
+      label : "Allowlist",
       icon  : "fa7-solid:users-cog",
       href  : "/users",
     } )
@@ -62,7 +61,7 @@ const secondaryItems = computed<NavigationMenuItem[]>( () => [
   },
 ] )
 
-const profileDropdownItems = [
+const profileDropdownItems = computed( () => [
   [
     {
       label    : "Akun",
@@ -70,30 +69,26 @@ const profileDropdownItems = [
       disabled : true,
     },
   ],
-  // [
-  //   {
-  //     label : "Profil Saya",
-  //     icon  : "i-ph-user-duotone",
-  //     click : () => router.replace( { name: "profile" } ),
-  //   },
-  // ],
   [
     {
       label    : "Keluar",
       icon     : "i-ph-sign-out",
       onSelect : async () => {
+        // Guard: only logout if actually logged in
+        if ( !loggedIn.value ) return
+        
         await clear()
-        router.replace( { path: "/login" } )
         toast.add( {
           color       : "error",
           title       : "Keluar!",
           icon        : "i-ph-sign-out",
           description : "Anda telah keluar dari akun Anda.",
         } )
+        router.replace( { path: "/login" } )
       },
     },
   ],
-]
+] )
 </script>
 
 <template>
@@ -143,8 +138,8 @@ const profileDropdownItems = [
         <template #footer="{ collapsed }">
           <UDropdownMenu v-if="loggedIn" :items="profileDropdownItems" mode="hover">
             <UButton variant="link" class="p-0 cursor-pointer">
-              <UAvatar :src="`https://unavatar.io/gravatar/${user.email}`" class="bg-gray-200 dark:bg-neutral-800" />
-              <p v-if="!collapsed" class="truncate">{{ user.email }}</p>
+              <UAvatar :src="`https://unavatar.io/gravatar/${user?.email}`" class="bg-gray-200 dark:bg-neutral-800" />
+              <p v-if="!collapsed" class="truncate">{{ user?.email }}</p>
             </UButton>
 
             <template #account>
@@ -153,7 +148,7 @@ const profileDropdownItems = [
                   Masuk sebagai
                 </p>
                 <p class="truncate font-medium">
-                  {{ user.email }}
+                  {{ user?.email }}
                 </p>
               </div>
             </template>

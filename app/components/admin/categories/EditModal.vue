@@ -71,7 +71,7 @@ function cancelEdit() {
 async function onSubmit() {
   isLoading.value = true
   try {
-    await $fetch( `/api/categories/${props.editId}`, {
+    await useNuxtApp().$api( `/api/categories/${props.editId}`, {
       method : "put",
       body   : { ...state },
     } )

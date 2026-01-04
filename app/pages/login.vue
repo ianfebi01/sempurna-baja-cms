@@ -1,24 +1,12 @@
 <template>
   <UAuthForm
-    :schema="schema"
     title="Masuk"
     description="Masuk ke akun Anda"
     icon="i-lucide-user"
-    :fields="fields"
-    :loading="loading"
-    @submit="onSubmit">
-    <template #description>
-      Belum punya akun? <ULink to="/register" class="text-primary font-medium">Daftar</ULink>.
-    </template>
-  </UAuthForm>
+    :providers="providers" />
 </template>
 
 <script setup lang="ts">
-import * as z from "zod"
-import type { FormSubmitEvent, AuthFormField } from "@nuxt/ui"
-import { useAuth } from "~/compossables/useAuth"
-import type { ApiError, ApiSuccess, Login } from "~~/shared/types"
-
 definePageMeta( {
     layout     : "auth",
     middleware : "auth",
@@ -26,78 +14,72 @@ definePageMeta( {
 
 const toast = useToast()
 const router = useRouter()
-const loading = ref( false )
-const fields: AuthFormField[] = [{
-    name        : "email",
-    type        : "email",
-    label       : "Email",
-    placeholder : "Masukkan email",
-    required    : true,
-}, {
-    name        : "password",
-    label       : "Password",
-    type        : "password",
-    placeholder : "Masukkan password",
-    required    : true,
-}]
+const route = useRoute()
 
-const schema = z.object( {
-    email    : z.email( "Email tidak valid" ),
-    password : z.string( "Password tidak boleh kosong" ).min( 8, "Password minimal 8 karakter" ),
-} )
+const { openInPopup, loggedIn } = useUserSession()
 
-type Schema = z.output<typeof schema>
-
-async function onSubmit( payload: FormSubmitEvent<Schema> ) {
-    loading.value = true
-    const loginForm = payload.data
-    await login( loginForm )
-    loading.value = false
+// Error message mapping
+const errorMessages: Record<string, string> = {
+    not_allowed   : "Anda tidak memiliki izin untuk masuk. Hubungi administrator.",
+    oauth_failed  : "Gagal masuk dengan Google. Silakan coba lagi.",
+    db_connection : "Terjadi kesalahan koneksi. Silakan coba lagi nanti.",
 }
 
-const { me } = useAuth()
+// Show error toast helper
+function showError( errorCode: string ) {
+    toast.add( {
+        color       : "error",
+        title       : "Gagal Masuk",
+        icon        : "i-ph-x-circle",
+        description : errorMessages[errorCode] || "Terjadi kesalahan. Silakan coba lagi.",
+    } )
+}
 
-async function login( loginForm: Schema ) {
-    try {
-        const data = await $fetch<ApiSuccess<Login> | ApiError>( "/api/auth/login", {
-            method : "POST",
-            body   : loginForm,
-            retry  : 0,
-        } )
-
-        if ( data.success ) {
-            await me()
-
-            toast.add( {
-                title       : "Berhasil Masuk",
-                icon        : "i-ph-sign-in",
-                description : `${data.data.user} berhasil masuk.`,
-            } )
-            router.replace( "/" )
-        } else {
-            // ApiError shape
-            toast.add( {
-                title       : "Gagal Masuk",
-                description : data.error?.message ?? "Login gagal.",
-                color       : "error",
-            } )
-        }
-    } catch ( err: unknown ) {
-        const error = err as { data: ApiError, status: number }
-        if ( ( err as { data: ApiError, status: number } )?.status === 401 ) {
-            toast.add( {
-                title       : "Gagal Masuk",
-                description : error?.data.error?.message ?? "Email atau password salah.",
-                color       : "error",
-            } )
-        } else {
-            toast.add( {
-                title       : "Error",
-                description : error?.data.error?.message ?? "Terjadi kesalahan pada server.",
-                color       : "error",
-            } )
-        }
+// Listen for error messages from OAuth popup
+function handleOAuthMessage( event: MessageEvent ) {
+    if ( event.origin !== window.location.origin ) return
+    if ( event.data?.type === "oauth-error" && event.data?.error ) {
+        showError( event.data.error )
     }
 }
 
+onMounted( () => {
+    // Listen for postMessage from popup
+    window.addEventListener( "message", handleOAuthMessage )
+
+    // Handle error from direct redirect (fallback)
+    const error = route.query.error as string
+    if ( error ) {
+        showError( error )
+        router.replace( { query: {} } )
+    }
+} )
+
+onUnmounted( () => {
+    window.removeEventListener( "message", handleOAuthMessage )
+} )
+
+// Watch for login state changes (e.g., after OAuth popup completes)
+watch( loggedIn, ( isLoggedIn ) => {
+    if ( isLoggedIn ) {
+        // Clear any lingering toasts (e.g., logout toast from previous session)
+        toast.clear()
+        toast.add( {
+            color       : "success",
+            title       : "Berhasil!",
+            icon        : "i-ph-check-circle",
+            description : "Anda berhasil masuk.",
+        } )
+        router.replace( "/" )
+    }
+} )
+
+const providers = [{
+    label   : "Google",
+    icon    : "i-simple-icons-google",
+    onClick : () => {
+        openInPopup( "/api/auth/google" )
+    },
+},
+]
 </script>

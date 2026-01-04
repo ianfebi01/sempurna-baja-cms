@@ -4,9 +4,7 @@ import { ObjectId } from "mongodb"
 
 export default defineApi( async ( event ) => {
   // Require auth
-  const me = await requireAuth( event )
-  const email = me?.email
-  if ( !email ) return fail( 401, "Unauthorized", "UNAUTHORIZED" )
+  await requireRole( event, ["admin", "super-admin"] )
 
   // Get Id
   const id = event.context.params?.id

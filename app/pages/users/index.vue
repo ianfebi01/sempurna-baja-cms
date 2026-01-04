@@ -79,7 +79,7 @@
               <USelect
                 v-model="addingState.role"
                 :items="roleItems"
-                placeholder="Pilih peran"
+                placeholder="Pilih initial role"
                 class="w-full" />
             </UFormField>
 
@@ -119,7 +119,6 @@
 import type { TableColumn } from "@nuxt/ui"
 import type { Role } from "#shared/types"
 import type { ApiSuccess } from "~~/shared/types"
-import { useAuth } from "~/compossables/useAuth"
 import z from "zod"
 import { RoleEnum } from "~~/server/models/allowlist.schema"
 
@@ -133,12 +132,12 @@ const UButton = resolveComponent( "UButton" )
 const toast = useToast()
 
 // Auth role
-const { user } = useAuth()
+const { user } = useUserSession()
 const isSuperAdmin = computed( () => user.value?.role === "super-admin" )
 
 // Fetch allowlist
 interface AllowItem { email: string; role: Role }
-const { data, status } = await useFetch<ApiSuccess<AllowItem[]>>( "/api/allowlist", {
+const { data, status } = await useAPI<ApiSuccess<AllowItem[]>>( "/api/allowlist", {
     lazy   : true,
     server : false,
     key    : "allowlist",
@@ -158,7 +157,7 @@ const filteredRows = computed( () => {
 // Table columns
 const columns: TableColumn<AllowItem>[] = [
     { accessorKey: "email", header: "Email" },
-    { accessorKey: "role", header: "Peran", cell: ( { row } ) => row.original.role === "super-admin" ? "Super Admin" : "Admin" },
+    { accessorKey: "role", header: "Initial Role", cell: ( { row } ) => row.original.role === "super-admin" ? "Super Admin" : "Admin" },
     {
         id     : "actions",
         header : "",
@@ -216,7 +215,7 @@ async function onAdd() {
     adding.value = true
     try {
         const payload = { email: addingState.email, role: addingState.role }
-        await $fetch( "/api/allowlist/create", { method: "POST", body: payload } )
+        await useNuxtApp().$api( "/api/allowlist/create", { method: "POST", body: payload } )
         toast.add( { title: "Sukses", description: "Email ditambahkan ke allowlist", color: "success" } )
         onCloseAdd()
         await refreshNuxtData( "allowlist" )
@@ -241,7 +240,7 @@ async function confirmDelete() {
     if ( !itemToDelete.value || !isSuperAdmin.value ) return
     deletingEmail.value = itemToDelete.value.email
     try {
-        await $fetch( `/api/allowlist/${encodeURIComponent( itemToDelete.value.email )}`.toString(), { method: "DELETE" } )
+        await useNuxtApp().$api( "/api/allowlist/delete", { method: "POST", body: { email: itemToDelete.value.email } } )
         toast.add( { title: "Sukses", description: "Email dihapus dari allowlist", color: "success" } )
         await refreshNuxtData( "allowlist" )
     } catch {

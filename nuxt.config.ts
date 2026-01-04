@@ -42,16 +42,19 @@ export default defineNuxtConfig( {
       dbName  : process.env.MONGODB_DB_NAME,
       appName : process.env.MONGODB_DB_NAME,
     },
+    session: {
+      password : process.env.NUXT_SESSION_PASSWORD as string,
+      maxAge   : 60 * 60 * 24 * 7, // 1 week
+    },
+    oauth: {
+      google: {
+        clientId     : process.env.GOOGLE_CLIENT_ID,
+        clientSecret : process.env.GOOGLE_CLIENT_SECRET,
+      },
+    },
   },
-  modules: [
-    "@nuxt/eslint",
-    "@nuxtjs/sitemap",
-    "@nuxtjs/robots",
-    "@nuxt/icon",
-    "@nuxt/image",
-    "@nuxt/ui",
-  ],
-  eslint: {
+  modules : ["@nuxt/eslint", "@nuxtjs/sitemap", "@nuxtjs/robots", "@nuxt/icon", "@nuxt/image", "@nuxt/ui", "nuxt-auth-utils"],
+  eslint  : {
     checker: true,
   },
   postcss: {

@@ -8,6 +8,8 @@ export default defineEventHandler( async ( event ) => {
         throw createError( { statusCode: 400, statusMessage: "Tidak ada file yang diunggah." } )
     }
 
+    await requireRole( event, ["admin", "super-admin"] )
+
     const url = await uploadImageToCloudinary( {
         data     : file.data,
         type     : file.type,

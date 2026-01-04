@@ -1,7 +1,6 @@
-import { useAuth } from "~/compossables/useAuth"
-
 export default defineNuxtRouteMiddleware( ( to ) => {
-  const { loggedIn } = useAuth()
+  const { loggedIn } = useUserSession()
+
   const authPages = ["/login", "/register"]
 
   // Redirect logged-in users away from login/register

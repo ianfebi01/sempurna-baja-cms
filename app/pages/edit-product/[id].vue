@@ -17,7 +17,7 @@ const router = useRouter()
 
 const route = useRoute()
 const productId = route.params.id as string
-const { data: productData, pending: productPending } = await useFetch<ApiSuccess<Partial<Product>>>( `/api/products/${productId}`, {
+const { data: productData, pending: productPending } = await useAPI<ApiSuccess<Partial<Product>>>( `/api/products/${productId}`, {
   key: `product-${productId}`,
 } )
 
@@ -143,7 +143,7 @@ async function onSubmit( event: FormSubmitEvent<Schema> ) {
         formData.append( key, state[key as keyof typeof state] as Blob )
     } )
 
-    await $fetch<{ url: string }>( `/api/products/${productId}`, {
+    await useNuxtApp().$api<{ url: string }>( `/api/products/${productId}`, {
       method : "put",
       body   : formData,
     } )
@@ -167,7 +167,7 @@ async function onSubmit( event: FormSubmitEvent<Schema> ) {
  * Categories
  */
 
-const { data: categories, pending: categoriesPending } = useFetch<ApiSuccess<Category[]>>( "/api/categories", {
+const { data: categories, pending: categoriesPending } = useAPI<ApiSuccess<Category[]>>( "/api/categories", {
   key: "categories",
 } )
 
@@ -183,7 +183,7 @@ const categoryItems = computed( () => {
  * Brand
  */
 
-const { data: brands, pending: brandsPending } = useFetch<ApiSuccess<Brand[]>>( "/api/brands", {
+const { data: brands, pending: brandsPending } = useAPI<ApiSuccess<Brand[]>>( "/api/brands", {
   key: "brands",
 } )
 

@@ -4,9 +4,7 @@ import clientPromise, { DB_NAME } from "~~/server/lib/mongodb"
 import { ObjectId } from "mongodb"
 
 export default defineApi( async ( event ) => {
-  const me = await requireAuth( event )
-  const email = me?.email
-  if ( !email ) return fail( 401, "Tidak diizinkan.", "UNAUTHORIZED" )
+  await requireRole( event, ["admin", "super-admin"] )
 
   const id = event.context.params?.id
   if ( !id || !ObjectId.isValid( id ) ) return fail( 400, "ID kategori tidak valid.", "BAD_REQUEST" )

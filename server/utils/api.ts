@@ -2,6 +2,8 @@ import type { H3Error, H3Event } from "h3"
 import { createError, setResponseStatus } from "h3"
 import type { ZodError } from "zod"
 import type { ApiError, ApiMeta, ApiSuccess } from "~~/shared/types"
+import clientPromise, { DB_NAME } from "~~/server/lib/mongodb"
+import { USER_COLLECTION } from "~~/server/models/user.schema"
 
 export function baseMeta( event: H3Event ) {
   // eslint-disable-next-line no-underscore-dangle
@@ -90,4 +92,46 @@ export function fail(
     statusMessage : message,
     data          : { code, details },
   } )
+}
+
+/**
+ * Require specific role(s) for API access.
+ * Returns 401 if not authenticated or user deleted, 403 if role not allowed.
+ * Validates user existence in database to handle deleted users with valid sessions.
+ */
+export async function requireRole(
+  event: H3Event,
+  allowedRoles: string | string[],
+): Promise<{ email: string; role: string }> {
+  const session = await getUserSession( event )
+  const user = session?.user
+
+  if ( !user?.email ) {
+    throw fail( 401, "Tidak diizinkan.", "UNAUTHORIZED" )
+  }
+
+  // Verify user still exists in database
+  const client = await clientPromise
+  if ( !client ) {
+    throw fail( 500, "Database connection error.", "DB_ERROR" )
+  }
+
+  const db = client.db( DB_NAME )
+  const dbUser = await db.collection( USER_COLLECTION ).findOne( { email: user.email } )
+
+  if ( !dbUser ) {
+    // User was deleted from database - clear session
+    await clearUserSession( event )
+    throw fail( 401, "Akun tidak ditemukan. Silakan login kembali.", "USER_DELETED" )
+  }
+
+  // Use role from database (source of truth)
+  const currentRole = ( dbUser.role as string ) ?? "admin"
+
+  const roles = Array.isArray( allowedRoles ) ? allowedRoles : [allowedRoles]
+  if ( !roles.includes( currentRole ) ) {
+    throw fail( 403, "Akses ditolak.", "FORBIDDEN" )
+  }
+
+  return { email: user.email, role: currentRole }
 }

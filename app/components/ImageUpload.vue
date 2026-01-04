@@ -26,7 +26,7 @@ async function handleUpload() {
     const formData = new FormData()
     formData.append( "file", file.value )
 
-    const res = await $fetch<{ url: string }>( "/api/upload", {
+    const res = await useNuxtApp().$api<{ url: string }>( "/api/upload", {
       method : "POST",
       body   : formData,
     } )

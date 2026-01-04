@@ -104,7 +104,7 @@ async function onSubmit( event: FormSubmitEvent<Schema> ) {
         formData.append( key, state[key as keyof typeof state] as Blob )
     } )
 
-    await $fetch<{ url: string }>( "/api/products/create", {
+    await useNuxtApp().$api<{ url: string }>( "/api/products/create", {
       method : "POST",
       body   : formData,
     } )
@@ -128,7 +128,7 @@ async function onSubmit( event: FormSubmitEvent<Schema> ) {
  * Categories
  */
 
-const { data: categories, pending: categoriesPending } = useFetch<ApiSuccess<Category[]>>( "/api/categories", {
+const { data: categories, pending: categoriesPending } = useAPI<ApiSuccess<Category[]>>( "/api/categories", {
   key: "categories",
 } )
 
@@ -143,7 +143,7 @@ const categoryItems = computed( () => {
  * Brand
  */
 
-const { data: brands, pending: brandsPending } = useFetch<ApiSuccess<Brand[]>>( "/api/brands", {
+const { data: brands, pending: brandsPending } = useAPI<ApiSuccess<Brand[]>>( "/api/brands", {
   key: "brands",
 } )
 
@@ -267,5 +267,4 @@ const brandItems = computed( () => {
       </div>
     </template>
   </UDashboardPanel>
-
 </template>
