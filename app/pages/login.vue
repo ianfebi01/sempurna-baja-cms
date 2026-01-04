@@ -1,9 +1,18 @@
 <template>
-  <UAuthForm
-    title="Masuk"
-    description="Masuk ke akun Anda"
-    icon="i-lucide-user"
-    :providers="providers" />
+  <div class="flex flex-col gap-4">
+    <UAuthForm
+      title="Masuk"
+      description="Masuk ke akun Anda"
+      icon="i-lucide-user"
+      :providers="providers" />
+    <p class="text-center text-sm text-gray-400">
+      Dengan masuk, Anda menyetujui
+      <NuxtLink
+        to="/privacy-policy"
+        class="text-blue-400 hover:text-blue-300 underline">Kebijakan Privasi</NuxtLink>
+      kami.
+    </p>
+  </div>
 </template>
 
 <script setup lang="ts">
