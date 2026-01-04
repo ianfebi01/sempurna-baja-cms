@@ -91,3 +91,24 @@ export function fail(
     data          : { code, details },
   } )
 }
+
+/**
+ * Require specific role(s) for API access.
+ * Returns 401 if not authenticated, 403 if role not allowed.
+ */
+export async function requireRole(
+  event: H3Event,
+  allowedRoles: string | string[],
+): Promise<{ email: string; role: string }> {
+  const { user } = await requireUserSession( event )
+  if ( !user?.email || !user?.role ) {
+    throw fail( 401, "Tidak diizinkan.", "UNAUTHORIZED" )
+  }
+
+  const roles = Array.isArray( allowedRoles ) ? allowedRoles : [allowedRoles]
+  if ( !roles.includes( user.role as string ) ) {
+    throw fail( 403, "Akses ditolak.", "FORBIDDEN" )
+  }
+
+  return { email: user.email, role: user.role as string }
+}

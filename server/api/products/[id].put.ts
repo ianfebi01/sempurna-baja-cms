@@ -37,9 +37,7 @@ export default defineApi( async ( event ) => {
     }
   }
 
-  const { user } = await requireUserSession( event )
-  const email = user?.email
-  if ( !email ) return fail( 401, "Tidak diizinkan.", "UNAUTHORIZED" )
+  await requireRole( event, ["admin", "super-admin"] )
 
   const textSchema = z.object( {
     name        : z.string().min( 2, "Nama terlalu pendek" ),

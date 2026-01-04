@@ -2,8 +2,7 @@ import clientPromise, { DB_NAME } from "~~/server/lib/mongodb"
 import { ALLOWLIST_COLLECTION } from "~~/server/models/allowlist.schema"
 
 export default defineApi( async ( event ) => {
-  const { user } = await requireUserSession( event )
-  if ( !user?.email || user?.role !== "super-admin" ) return fail( 401, "Tidak diizinkan.", "UNAUTHORIZED" )
+  const { email: currentUserEmail } = await requireRole( event, "super-admin" )
 
   const body = await readBody( event )
   const email = body?.email
@@ -11,7 +10,7 @@ export default defineApi( async ( event ) => {
   const emailNorm = String( email ).trim().toLowerCase()
 
   // Prevent super-admin from deleting their own allowlist entry
-  if ( user?.email && user.email.toLowerCase() === emailNorm ) {
+  if ( currentUserEmail.toLowerCase() === emailNorm ) {
     return fail( 403, "Tidak boleh menghapus email sendiri", "FORBIDDEN" )
   }
 

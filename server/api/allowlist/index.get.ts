@@ -2,10 +2,7 @@ import clientPromise, { DB_NAME } from "~~/server/lib/mongodb"
 import { ALLOWLIST_COLLECTION } from "~~/server/models/allowlist.schema"
 
 export default defineApi( async ( event ) => {
-  const { user } = await requireUserSession( event )
-  const email = user?.email
-  const role = user?.role
-  if ( !email || role !== "super-admin" ) return fail( 401, "Tidak diizinkan.", "UNAUTHORIZED" )
+  await requireRole( event, "super-admin" )
 
   const client = await clientPromise
   if ( !client ) return fail( 500, "Koneksi database gagal", "INTERNAL_SERVER_ERROR" )
