@@ -44,7 +44,7 @@ export default defineNuxtConfig( {
     },
     session: {
       password : process.env.NUXT_SESSION_PASSWORD as string,
-      maxAge   : 60 * 2, // 2 minutes
+      maxAge   : 60 * 60 * 24 * 7, // 1 week
     },
     oauth: {
       google: {
