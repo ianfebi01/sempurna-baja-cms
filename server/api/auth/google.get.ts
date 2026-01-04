@@ -42,6 +42,12 @@ export default defineOAuthGoogleEventHandler( {
     let role: Role = "admin"
 
     if ( existingUser ) {
+      // Check if existing user is approved
+      const isApproved = ( existingUser as { isApproved?: boolean } ).isApproved
+      if ( isApproved === false ) {
+        return sendErrorToParent( event, "not_approved" )
+      }
+
       // Check if existing user is still in allowlist
       const allowed = await db.collection( ALLOWLIST_COLLECTION ).findOne( { email: emailNorm } )
       role = ( existingUser as { role?: Role } ).role ?? "admin"
@@ -81,11 +87,12 @@ export default defineOAuthGoogleEventHandler( {
 
       // Create user
       await db.collection( USER_COLLECTION ).insertOne( {
-        email    : emailNorm,
-        name     : user.name,
-        picture  : user.picture,
-        googleId : user.sub,
+        email      : emailNorm,
+        name       : user.name,
+        picture    : user.picture,
+        googleId   : user.sub,
         role,
+        isApproved : true, // Auto-approved since they passed allowlist check
       } )
     }
 

@@ -125,6 +125,12 @@ export async function requireRole(
     throw fail( 401, "Akun tidak ditemukan. Silakan login kembali.", "USER_DELETED" )
   }
 
+  // Check if user is approved
+  if ( dbUser.isApproved === false ) {
+    await clearUserSession( event )
+    throw fail( 401, "Akun Anda belum disetujui. Hubungi administrator.", "NOT_APPROVED" )
+  }
+
   // Use role from database (source of truth)
   const currentRole = ( dbUser.role as string ) ?? "admin"
 

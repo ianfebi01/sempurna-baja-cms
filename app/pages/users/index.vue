@@ -1,7 +1,7 @@
 <template>
-  <UDashboardPanel id="allowlist">
+  <UDashboardPanel id="users-management">
     <template #header>
-      <UDashboardNavbar title="Allowlist Pengguna" :ui="{ right: 'gap-3' }">
+      <UDashboardNavbar title="Manajemen Pengguna" :ui="{ right: 'gap-3' }">
         <template #leading>
           <UDashboardSidebarCollapse />
         </template>
@@ -18,44 +18,93 @@
     </template>
 
     <template #body>
-      <div class="flex flex-wrap items-center justify-between gap-1.5">
-        <UInput
-          v-model="search"
-          class="max-w-sm"
-          icon="i-lucide-search"
-          placeholder="Cari email..."
-          :ui="{ trailing: 'pe-1' }">
-          <template v-if="search?.length" #trailing>
-            <UButton
-              color="neutral"
-              variant="link"
-              size="sm"
-              icon="i-lucide-circle-x"
-              aria-label="Clear input"
-              @click="search = ''" />
-          </template>
-        </UInput>
+      <!-- Registered Users Section -->
+      <div class="mb-8">
+        <h3 class="text-lg font-semibold mb-4">Pengguna Terdaftar</h3>
+        <div class="flex flex-wrap items-center justify-between gap-1.5 mb-4">
+          <UInput
+            v-model="userSearch"
+            class="max-w-sm"
+            icon="i-lucide-search"
+            placeholder="Cari pengguna..."
+            :ui="{ trailing: 'pe-1' }">
+            <template v-if="userSearch?.length" #trailing>
+              <UButton
+                color="neutral"
+                variant="link"
+                size="sm"
+                icon="i-lucide-circle-x"
+                aria-label="Clear input"
+                @click="userSearch = ''" />
+            </template>
+          </UInput>
+        </div>
+
+        <ClientOnly>
+          <UTable
+            class="shrink-0"
+            :data="filteredUsers"
+            :columns="userColumns"
+            :loading="usersStatus === 'pending'"
+            :ui="{
+              base: 'table-fixed border-separate border-spacing-0',
+              thead: '[&>tr]:bg-elevated/50 [&>tr]:after:content-none',
+              tbody: '[&>tr]:last:[&>td]:border-b-0',
+              th: 'py-2 first:rounded-l-lg last:rounded-r-lg border-y border-default first:border-l last:border-r',
+              td: 'border-b border-default',
+              separator: 'h-0'
+            }" />
+        </ClientOnly>
+
+        <div class="text-sm text-muted mt-3">
+          {{ filteredUsers.length }} dari {{ usersData?.data?.length || 0 }} pengguna.
+        </div>
       </div>
 
-      <ClientOnly>
-        <UTable
-          class="shrink-0"
-          :data="filteredRows"
-          :columns="columns"
-          :loading="status === 'pending'"
-          :ui="{
-            base: 'table-fixed border-separate border-spacing-0',
-            thead: '[&>tr]:bg-elevated/50 [&>tr]:after:content-none',
-            tbody: '[&>tr]:last:[&>td]:border-b-0',
-            th: 'py-2 first:rounded-l-lg last:rounded-r-lg border-y border-default first:border-l last:border-r',
-            td: 'border-b border-default',
-            separator: 'h-0'
-          }" />
-      </ClientOnly>
+      <USeparator class="my-6" />
 
-      <div class="flex items-center justify-between gap-3 border-t border-default pt-4 mt-auto">
-        <div class="text-sm text-muted">
-          {{ filteredRows.length }} dari {{ data?.data?.length || 0 }} email ditampilkan.
+      <!-- Allowlist Section -->
+      <div>
+        <h3 class="text-lg font-semibold mb-4">Allowlist Email</h3>
+        <p class="text-sm text-muted mb-4">Email yang diizinkan untuk mendaftar. Hanya email di daftar ini yang dapat login.</p>
+        
+        <div class="flex flex-wrap items-center justify-between gap-1.5 mb-4">
+          <UInput
+            v-model="allowlistSearch"
+            class="max-w-sm"
+            icon="i-lucide-search"
+            placeholder="Cari email..."
+            :ui="{ trailing: 'pe-1' }">
+            <template v-if="allowlistSearch?.length" #trailing>
+              <UButton
+                color="neutral"
+                variant="link"
+                size="sm"
+                icon="i-lucide-circle-x"
+                aria-label="Clear input"
+                @click="allowlistSearch = ''" />
+            </template>
+          </UInput>
+        </div>
+
+        <ClientOnly>
+          <UTable
+            class="shrink-0"
+            :data="filteredAllowlist"
+            :columns="allowlistColumns"
+            :loading="allowlistStatus === 'pending'"
+            :ui="{
+              base: 'table-fixed border-separate border-spacing-0',
+              thead: '[&>tr]:bg-elevated/50 [&>tr]:after:content-none',
+              tbody: '[&>tr]:last:[&>td]:border-b-0',
+              th: 'py-2 first:rounded-l-lg last:rounded-r-lg border-y border-default first:border-l last:border-r',
+              td: 'border-b border-default',
+              separator: 'h-0'
+            }" />
+        </ClientOnly>
+
+        <div class="text-sm text-muted mt-3">
+          {{ filteredAllowlist.length }} dari {{ allowlistData?.data?.length || 0 }} email.
         </div>
       </div>
 
@@ -128,6 +177,8 @@ definePageMeta( {
 } )
 
 const UButton = resolveComponent( "UButton" )
+const USwitch = resolveComponent( "USwitch" )
+const UAvatar = resolveComponent( "UAvatar" )
 
 const toast = useToast()
 
@@ -135,27 +186,137 @@ const toast = useToast()
 const { user } = useUserSession()
 const isSuperAdmin = computed( () => user.value?.role === "super-admin" )
 
-// Fetch allowlist
+// ==================== USERS SECTION ====================
+
+interface UserItem { 
+  _id: string
+  email: string
+  name?: string
+  picture?: string
+  role: Role
+  isApproved: boolean
+}
+
+const { data: usersData, status: usersStatus } = await useAPI<ApiSuccess<UserItem[]>>( "/api/users", {
+    lazy   : true,
+    server : false,
+    key    : "users-list",
+    method : "GET",
+} )
+
+const usersList = computed( () => usersData.value?.data || [] )
+
+// Search filter for users
+const userSearch = ref( "" )
+const filteredUsers = computed( () => {
+    const q = userSearch.value.trim().toLowerCase()
+    if ( !q ) return usersList.value
+    return usersList.value.filter( ( r ) => 
+      r.email.toLowerCase().includes( q ) || 
+      r.name?.toLowerCase().includes( q ) 
+    )
+} )
+
+// Track loading state for each user toggle
+const togglingUser = ref<string | null>( null )
+
+async function toggleUserApproval( userItem: UserItem ) {
+    if ( !isSuperAdmin.value || togglingUser.value ) return
+    togglingUser.value = userItem._id
+    try {
+        await useNuxtApp().$api( `/api/users/${userItem._id}`, { 
+            method : "PATCH", 
+            body   : { isApproved: !userItem.isApproved } 
+        } )
+        toast.add( { 
+            title       : "Sukses", 
+            description : userItem.isApproved ? "Pengguna dinonaktifkan" : "Pengguna diaktifkan", 
+            color       : "success" 
+        } )
+        await refreshNuxtData( "users-list" )
+    } catch {
+        toast.add( { title: "Gagal", description: "Tidak dapat mengubah status", color: "error" } )
+    } finally {
+        togglingUser.value = null
+    }
+}
+
+// User table columns
+const userColumns: TableColumn<UserItem>[] = [
+    { 
+        accessorKey : "name", 
+        header      : "Pengguna",
+        cell        : ( { row } ) => {
+            const item = row.original
+            return h( "div", { class: "flex items-center gap-3" }, [
+                h( UAvatar, { 
+                    src  : item.picture, 
+                    alt  : item.name || item.email,
+                    size : "sm",
+                } ),
+                h( "div", {}, [
+                    h( "div", { class: "font-medium" }, item.name || "—" ),
+                    h( "div", { class: "text-sm text-muted" }, item.email ),
+                ] ),
+            ] )
+        },
+    },
+    { 
+        accessorKey : "role", 
+        header      : "Role", 
+        cell        : ( { row } ) => row.original.role === "super-admin" ? "Super Admin" : "Admin" 
+    },
+    { 
+        accessorKey : "isApproved", 
+        header      : "Status",
+        cell        : ( { row } ) => {
+            const item = row.original
+            const isCurrentUser = user.value?.email === item.email
+            
+            if ( !isSuperAdmin.value ) {
+                return h( "span", { 
+                    class: item.isApproved ? "text-success" : "text-error" 
+                }, item.isApproved ? "Aktif" : "Nonaktif" )
+            }
+            
+            return h( "div", { class: "flex items-center gap-2" }, [
+                h( USwitch, {
+                    modelValue        : item.isApproved,
+                    disabled          : isCurrentUser || togglingUser.value === item._id,
+                    loading           : togglingUser.value === item._id,
+                    "onUpdate:modelValue" : () => toggleUserApproval( item ),
+                } ),
+                h( "span", { 
+                    class: `text-sm ${item.isApproved ? "text-success" : "text-error"}` 
+                }, item.isApproved ? "Aktif" : "Nonaktif" ),
+            ] )
+        },
+    },
+]
+
+// ==================== ALLOWLIST SECTION ====================
+
 interface AllowItem { email: string; role: Role }
-const { data, status } = await useAPI<ApiSuccess<AllowItem[]>>( "/api/allowlist", {
+
+const { data: allowlistData, status: allowlistStatus } = await useAPI<ApiSuccess<AllowItem[]>>( "/api/allowlist", {
     lazy   : true,
     server : false,
     key    : "allowlist",
     method : "GET",
 } )
 
-const rows = computed( () => data.value?.data || [] )
+const allowlistRows = computed( () => allowlistData.value?.data || [] )
 
-// Search filter
-const search = ref( "" )
-const filteredRows = computed( () => {
-    const q = search.value.trim().toLowerCase()
-    if ( !q ) return rows.value
-    return rows.value.filter( ( r ) => r.email.toLowerCase().includes( q ) )
+// Search filter for allowlist
+const allowlistSearch = ref( "" )
+const filteredAllowlist = computed( () => {
+    const q = allowlistSearch.value.trim().toLowerCase()
+    if ( !q ) return allowlistRows.value
+    return allowlistRows.value.filter( ( r ) => r.email.toLowerCase().includes( q ) )
 } )
 
-// Table columns
-const columns: TableColumn<AllowItem>[] = [
+// Allowlist table columns
+const allowlistColumns: TableColumn<AllowItem>[] = [
     { accessorKey: "email", header: "Email" },
     { accessorKey: "role", header: "Initial Role", cell: ( { row } ) => row.original.role === "super-admin" ? "Super Admin" : "Admin" },
     {
