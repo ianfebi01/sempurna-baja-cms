@@ -214,7 +214,7 @@ const filteredUsers = computed( () => {
     if ( !q ) return usersList.value
     return usersList.value.filter( ( r ) => 
       r.email.toLowerCase().includes( q ) || 
-      r.name?.toLowerCase().includes( q ) 
+      r.name?.toLowerCase().includes( q ), 
     )
 } )
 
@@ -227,12 +227,12 @@ async function toggleUserApproval( userItem: UserItem ) {
     try {
         await useNuxtApp().$api( `/api/users/${userItem._id}`, { 
             method : "PATCH", 
-            body   : { isApproved: !userItem.isApproved } 
+            body   : { isApproved: !userItem.isApproved }, 
         } )
         toast.add( { 
             title       : "Sukses", 
             description : userItem.isApproved ? "Pengguna dinonaktifkan" : "Pengguna diaktifkan", 
-            color       : "success" 
+            color       : "success", 
         } )
         await refreshNuxtData( "users-list" )
     } catch {
@@ -251,12 +251,12 @@ async function updateUserRole( userItem: UserItem, newRole: Role ) {
     try {
         await useNuxtApp().$api( `/api/users/${userItem._id}`, { 
             method : "PATCH", 
-            body   : { role: newRole } 
+            body   : { role: newRole }, 
         } )
         toast.add( { 
             title       : "Sukses", 
             description : `Role diubah menjadi ${newRole === "super-admin" ? "Super Admin" : "Admin"}`, 
-            color       : "success" 
+            color       : "success", 
         } )
         await refreshNuxtData( "users-list" )
     } catch {
@@ -316,19 +316,19 @@ const userColumns: TableColumn<UserItem>[] = [
             
             if ( !isSuperAdmin.value ) {
                 return h( "span", { 
-                    class: item.isApproved ? "text-success" : "text-error" 
+                    class: item.isApproved ? "text-success" : "text-error", 
                 }, item.isApproved ? "Aktif" : "Nonaktif" )
             }
             
             return h( "div", { class: "flex items-center gap-2" }, [
                 h( USwitch, {
-                    modelValue        : item.isApproved,
-                    disabled          : isCurrentUser || togglingUser.value === item._id,
-                    loading           : togglingUser.value === item._id,
+                    modelValue            : item.isApproved,
+                    disabled              : isCurrentUser || togglingUser.value === item._id,
+                    loading               : togglingUser.value === item._id,
                     "onUpdate:modelValue" : () => toggleUserApproval( item ),
                 } ),
                 h( "span", { 
-                    class: `text-sm ${item.isApproved ? "text-success" : "text-error"}` 
+                    class: `text-sm ${item.isApproved ? "text-success" : "text-error"}`, 
                 }, item.isApproved ? "Aktif" : "Nonaktif" ),
             ] )
         },
