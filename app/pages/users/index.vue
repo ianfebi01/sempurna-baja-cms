@@ -79,7 +79,7 @@
               <USelect
                 v-model="addingState.role"
                 :items="roleItems"
-                placeholder="Pilih peran"
+                placeholder="Pilih initial role"
                 class="w-full" />
             </UFormField>
 
@@ -157,7 +157,7 @@ const filteredRows = computed( () => {
 // Table columns
 const columns: TableColumn<AllowItem>[] = [
     { accessorKey: "email", header: "Email" },
-    { accessorKey: "role", header: "Peran", cell: ( { row } ) => row.original.role === "super-admin" ? "Super Admin" : "Admin" },
+    { accessorKey: "role", header: "Initial Role", cell: ( { row } ) => row.original.role === "super-admin" ? "Super Admin" : "Admin" },
     {
         id     : "actions",
         header : "",

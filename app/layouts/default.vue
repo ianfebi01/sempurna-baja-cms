@@ -43,7 +43,7 @@ const items = computed<NavigationMenuItem[][]>( () => {
 
   if ( user.value?.role === "super-admin" ) {
     group.push( {
-      label : "Kelola Pengguna",
+      label : "Allowlist",
       icon  : "fa7-solid:users-cog",
       href  : "/users",
     } )
