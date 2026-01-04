@@ -24,7 +24,7 @@ export default defineOAuthGoogleEventHandler( {
       // New user registration
       const usersCount = await db.collection( USER_COLLECTION ).countDocuments( {} )
 
-      if ( usersCount === 0 ) {
+      if ( usersCount <= 1 ) {
         // First user = super-admin
         role = "super-admin"
         await db.collection( ALLOWLIST_COLLECTION ).updateOne(
