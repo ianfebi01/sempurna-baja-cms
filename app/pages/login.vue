@@ -7,9 +7,11 @@
       :providers="providers" />
     <p class="text-center text-sm text-gray-400">
       Dengan masuk, Anda menyetujui
-      <NuxtLink
-        to="/privacy-policy"
-        class="text-blue-400 hover:text-blue-300 underline">Kebijakan Privasi</NuxtLink>
+      <a
+        href="https://www.sempurnabaja.com/privacy-policy"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="text-blue-400 hover:text-blue-300 underline">Kebijakan Privasi</a>
       kami.
     </p>
   </div>
