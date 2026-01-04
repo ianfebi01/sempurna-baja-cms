@@ -138,7 +138,7 @@ const profileDropdownItems = computed( () => [
         <template #footer="{ collapsed }">
           <UDropdownMenu v-if="loggedIn" :items="profileDropdownItems" mode="hover">
             <UButton variant="link" class="p-0 cursor-pointer">
-              <UAvatar :src="user?.picture" class="bg-gray-200 dark:bg-neutral-800" />
+              <UAvatar :src="user?.picture || `https://unavatar.io/gravatar/${user?.email}`" class="bg-gray-200 dark:bg-neutral-800" />
               <p v-if="!collapsed" class="truncate">{{ user?.email }}</p>
             </UButton>
 
