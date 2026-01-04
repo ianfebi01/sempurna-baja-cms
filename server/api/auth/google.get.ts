@@ -61,7 +61,6 @@ export default defineOAuthGoogleEventHandler( {
     } else {
       // New user registration
       const usersCount = await db.collection( USER_COLLECTION ).countDocuments( {} )
-      console.log( 'usersCount', usersCount )
 
       if ( usersCount === 0 ) {
         // First user = super-admin
@@ -74,7 +73,7 @@ export default defineOAuthGoogleEventHandler( {
       } else {
         // Check allowlist
         const allowed = await db.collection( ALLOWLIST_COLLECTION ).findOne( { email: emailNorm } )
-        console.log( 'allowed', allowed )
+
         if ( !allowed ) return sendErrorToParent( event, "not_allowed" )
         role = ( allowed as { role?: Role } ).role ?? "admin"
       }
@@ -84,14 +83,14 @@ export default defineOAuthGoogleEventHandler( {
         email    : emailNorm,
         name     : user.name,
         picture  : user.picture,
-        googleId : user.id,
+        googleId : user.sub,
         role,
       } )
     }
 
     await setUserSession( event, {
       user: {
-        googleId : user.id,
+        googleId : user.sub,
         name     : user.name,
         email    : user.email,
         picture  : user.picture,
