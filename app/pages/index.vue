@@ -320,11 +320,8 @@ const columns: TableColumn<Product>[] = [
             items   : [
               {
                 label    : "Lihat", icon     : "i-lucide-eye", onSelect : () => {
-                  const route = router.resolve( {
-                    name   : "products-slug",
-                    params : { slug: row.original.slug },
-                  } )
-                  window.open( route.href, "_blank" )
+                  const config = useRuntimeConfig()
+                  window.open( `${config.public.landingPageUrl}/products/${row.original.slug}`, "_blank" )
                 },
               },
               { label: "Edit", icon: "i-lucide-pencil", onSelect: () => router.push( `/edit-product/${row.original._id}` ) },

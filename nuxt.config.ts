@@ -28,8 +28,9 @@ export default defineNuxtConfig( {
   runtimeConfig     : {
     deployHook : process.env.DEPLOY_HOOK,
     public     : {
-      siteName : process.env.NUXT_SITE_NAME,
-      siteUrl  : resolveSiteUrl(),
+      siteName       : process.env.NUXT_SITE_NAME,
+      siteUrl        : resolveSiteUrl(),
+      landingPageUrl : process.env.NUXT_LANDING_PAGE_URL || 'http://localhost:3001',
     },
     auth: {
       mongo: {
