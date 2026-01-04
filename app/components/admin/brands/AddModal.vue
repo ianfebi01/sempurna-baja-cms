@@ -51,7 +51,7 @@ async function onSubmit( event: FormSubmitEvent<Schema> ) {
     isLoading.value = true
 
     try {
-        await $fetch<{ url: string }>( "/api/brands/create", {
+        await useNuxtApp().$api<{ url: string }>( "/api/brands/create", {
             method : "POST",
             body   : state,
         } )

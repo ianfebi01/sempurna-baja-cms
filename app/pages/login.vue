@@ -4,6 +4,7 @@
     description="Masuk ke akun Anda"
     icon="i-lucide-user"
     :providers="providers" />
+    <pre>{{ user }}</pre>
 </template>
 
 <script setup lang="ts">
@@ -14,7 +15,7 @@ definePageMeta( {
 
 const toast = useToast()
 
-const { openInPopup } = useUserSession()
+const { openInPopup, user } = useUserSession()
 
 const providers = [{
     label   : "Google",

@@ -1,33 +1,46 @@
-export default defineNuxtPlugin( ( nuxtApp ) => {
-  const api = $fetch.create( {
-    async onResponse( { response } ) {
-      // Handle API wrapper returning success: false with UNAUTHORIZED
-      // Your defineApi wrapper returns 200 OK with { success: false, error: { code: 'UNAUTHORIZED' } }
+/**
+ * Custom $api plugin with centralized error handling
+ * - Provides $api as a drop-in replacement for $fetch
+ * - Clears session and redirects to login on 401/UNAUTHORIZED
+ */
+export default defineNuxtPlugin(() => {
+  const { clear } = useUserSession()
+  const toast = useToast()
+
+  const api = $fetch.create({
+    onResponseError: async ({ response }) => {
+      // Handle 401 Unauthorized
+      if (response.status === 401) {
+        await clear()
+        toast.add({
+          color: "error",
+          title: "Sesi Berakhir",
+          description: "Silakan masuk kembali.",
+          icon: "i-ph-warning",
+        })
+        await navigateTo("/login")
+        return
+      }
+
+      // Handle API-level UNAUTHORIZED error code
       const data = response._data
-      if (
-        data &&
-        data.success === false &&
-        data.error?.code === "UNAUTHORIZED"
-      ) {
-        const { clear } = useUserSession()
+      if (data?.error?.code === "UNAUTHORIZED") {
         await clear()
-        await nuxtApp.runWithContext( () => navigateTo( "/login" ) )
+        toast.add({
+          color: "error",
+          title: "Sesi Berakhir",
+          description: "Silakan masuk kembali.",
+          icon: "i-ph-warning",
+        })
+        await navigateTo("/login")
+        return
       }
     },
-    async onResponseError( { response } ) {
-      // Handle actual HTTP 401 status (e.g., from requireUserSession throwing before defineApi catches it)
-      if ( response.status === 401 ) {
-        const { clear } = useUserSession()
-        await clear()
-        await nuxtApp.runWithContext( () => navigateTo( "/login" ) )
-      }
-    },
-  } )
+  })
 
   return {
     provide: {
       api,
     },
   }
-} )
-
+})

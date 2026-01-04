@@ -57,7 +57,7 @@
 import * as z from "zod"
 import AddModal from "./AddModal.vue"
 import EditModal from "./EditModal.vue"
-import { useFetch } from "#app"
+
 import type { Category } from "~~/shared/types/product"
 import type { ApiError } from "~~/shared/types"
 import type { ColumnDef } from "@tanstack/table-core"
@@ -93,7 +93,7 @@ const state = reactive<Partial<Schema>>( {
 
 const toast = useToast()
 
-const { data: categoriesData, pending: categoriesPending } = useFetch<{ data: Category[] }>( "/api/categories", {
+const { data: categoriesData, pending: categoriesPending } = useAPI<{ data: Category[] }>( "/api/categories", {
   server : false,
   key    : "categories",
 } )
@@ -103,7 +103,7 @@ const categories = computed( () => categoriesData.value?.data || [] )
 async function deleteCategory( id: string ) {
   deletingId.value = id
   try {
-    await $fetch( `/api/categories/${id}`, {
+    await useNuxtApp().$api( `/api/categories/${id}`, {
       method: "delete",
     } )
     toast.add( { title: "Sukses", description: "Kategori dihapus", color: "success" } )

@@ -12,7 +12,7 @@ async function handlePublish() {
 
   isPublishing.value = true
   try {
-    await $fetch( "/api/deploy/trigger", { method: "POST" } )
+    await useNuxtApp().$api( "/api/deploy/trigger", { method: "POST" } )
     toast.add( {
       color       : "success",
       title       : "Berhasil!",

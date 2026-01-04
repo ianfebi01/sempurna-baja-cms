@@ -137,7 +137,7 @@ const isSuperAdmin = computed( () => user.value?.role === "super-admin" )
 
 // Fetch allowlist
 interface AllowItem { email: string; role: Role }
-const { data, status } = await useFetch<ApiSuccess<AllowItem[]>>( "/api/allowlist", {
+const { data, status } = await useAPI<ApiSuccess<AllowItem[]>>( "/api/allowlist", {
     lazy   : true,
     server : false,
     key    : "allowlist",
@@ -215,7 +215,7 @@ async function onAdd() {
     adding.value = true
     try {
         const payload = { email: addingState.email, role: addingState.role }
-        await $fetch( "/api/allowlist/create", { method: "POST", body: payload } )
+        await useNuxtApp().$api( "/api/allowlist/create", { method: "POST", body: payload } )
         toast.add( { title: "Sukses", description: "Email ditambahkan ke allowlist", color: "success" } )
         onCloseAdd()
         await refreshNuxtData( "allowlist" )
@@ -240,7 +240,7 @@ async function confirmDelete() {
     if ( !itemToDelete.value || !isSuperAdmin.value ) return
     deletingEmail.value = itemToDelete.value.email
     try {
-        await $fetch( `/api/allowlist/${encodeURIComponent( itemToDelete.value.email )}`.toString(), { method: "DELETE" } )
+        await useNuxtApp().$api( `/api/allowlist/${encodeURIComponent( itemToDelete.value.email )}`.toString(), { method: "DELETE" } )
         toast.add( { title: "Sukses", description: "Email dihapus dari allowlist", color: "success" } )
         await refreshNuxtData( "allowlist" )
     } catch {

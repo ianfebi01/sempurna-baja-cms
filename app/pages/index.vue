@@ -135,7 +135,6 @@ import { upperFirst } from "scule"
 import { getPaginationRowModel } from "@tanstack/table-core"
 import type { Product, ProductResponse } from "#shared/types/product"
 import type { ApiError, ApiSuccess } from "~~/shared/types"
-import { useDebounce } from "~/compossables/useDebounce"
 
 definePageMeta( {
   layout     : "default",
@@ -166,7 +165,7 @@ const pagination = ref( {
 } )
 const columnFiltersDebounced = useDebounce( columnFilters, 500 )
 
-const { data, status } = await useFetch<ApiSuccess<ProductResponse>>( "/api/products", {
+const { data, status } = await useAPI<ApiSuccess<ProductResponse>>( "/api/products", {
   lazy   : true,
   server : false,
   key    : "products",
@@ -346,7 +345,7 @@ const columns: TableColumn<Product>[] = [
 
 // Categories
 
-const { data: categoriesData, pending: categoriesPending } = useFetch<{ data: Category[] }>( "/api/categories", {
+const { data: categoriesData, pending: categoriesPending } = useAPI<{ data: Category[] }>( "/api/categories", {
   server : true,
   key    : "categories",
 } )
@@ -386,7 +385,7 @@ const productToDelete = ref<Product | null>( null )
 async function deleteProduct( id: string ) {
   deletingId.value = id
   try {
-    await $fetch( `/api/products/${id}`, {
+    await useNuxtApp().$api( `/api/products/${id}`, {
       method: "delete",
     } )
     toast.add( { title: "Sukses", description: "Produk dihapus", color: "success" } )
@@ -414,3 +413,4 @@ function promptDeleteProduct( product: Product ) {
   showDeleteConfirm.value = true
 }
 </script>
+
