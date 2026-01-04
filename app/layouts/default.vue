@@ -61,7 +61,7 @@ const secondaryItems = computed<NavigationMenuItem[]>( () => [
   },
 ] )
 
-const profileDropdownItems = [
+const profileDropdownItems = computed( () => [
   [
     {
       label    : "Akun",
@@ -69,30 +69,26 @@ const profileDropdownItems = [
       disabled : true,
     },
   ],
-  // [
-  //   {
-  //     label : "Profil Saya",
-  //     icon  : "i-ph-user-duotone",
-  //     click : () => router.replace( { name: "profile" } ),
-  //   },
-  // ],
   [
     {
       label    : "Keluar",
       icon     : "i-ph-sign-out",
       onSelect : async () => {
+        // Guard: only logout if actually logged in
+        if ( !loggedIn.value ) return
+        
         await clear()
-        router.replace( { path: "/login" } )
         toast.add( {
           color       : "error",
           title       : "Keluar!",
           icon        : "i-ph-sign-out",
           description : "Anda telah keluar dari akun Anda.",
         } )
+        router.replace( { path: "/login" } )
       },
     },
   ],
-]
+] )
 </script>
 
 <template>
