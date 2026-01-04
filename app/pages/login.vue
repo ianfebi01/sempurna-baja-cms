@@ -15,7 +15,7 @@ definePageMeta( {
 const toast = useToast()
 const router = useRouter()
 
-const { openInPopup, loggedIn, user } = useUserSession()
+const { openInPopup, loggedIn } = useUserSession()
 
 // Watch for login state changes (e.g., after OAuth popup completes)
 watch( loggedIn, ( isLoggedIn ) => {

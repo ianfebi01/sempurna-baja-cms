@@ -43,8 +43,8 @@ export default defineNuxtConfig( {
       appName : process.env.MONGODB_DB_NAME,
     },
     session: {
-      password: process.env.NUXT_SESSION_PASSWORD as string,
-      maxAge: 60 * 2 // 2 minutes
+      password : process.env.NUXT_SESSION_PASSWORD as string,
+      maxAge   : 60 * 2, // 2 minutes
     },
     oauth: {
       google: {
