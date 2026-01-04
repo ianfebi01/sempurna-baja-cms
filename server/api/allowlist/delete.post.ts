@@ -5,7 +5,8 @@ export default defineApi( async ( event ) => {
   const { user } = await requireUserSession( event )
   if ( !user?.email || user?.role !== "super-admin" ) return fail( 401, "Tidak diizinkan.", "UNAUTHORIZED" )
 
-  const email = event.context.params?.email
+  const body = await readBody( event )
+  const email = body?.email
   if ( !email ) return fail( 400, "Email tidak valid", "BAD_REQUEST" )
   const emailNorm = String( email ).trim().toLowerCase()
 

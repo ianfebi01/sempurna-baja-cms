@@ -240,7 +240,7 @@ async function confirmDelete() {
     if ( !itemToDelete.value || !isSuperAdmin.value ) return
     deletingEmail.value = itemToDelete.value.email
     try {
-        await useNuxtApp().$api( `/api/allowlist/${encodeURIComponent( itemToDelete.value.email )}`.toString(), { method: "DELETE" } )
+        await useNuxtApp().$api( "/api/allowlist/delete", { method: "POST", body: { email: itemToDelete.value.email } } )
         toast.add( { title: "Sukses", description: "Email dihapus dari allowlist", color: "success" } )
         await refreshNuxtData( "allowlist" )
     } catch {
