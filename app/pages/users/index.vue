@@ -179,6 +179,7 @@ definePageMeta( {
 const UButton = resolveComponent( "UButton" )
 const USwitch = resolveComponent( "USwitch" )
 const UAvatar = resolveComponent( "UAvatar" )
+const USelect = resolveComponent( "USelect" )
 
 const toast = useToast()
 
@@ -241,6 +242,30 @@ async function toggleUserApproval( userItem: UserItem ) {
     }
 }
 
+// Track loading state for role change
+const updatingRole = ref<string | null>( null )
+
+async function updateUserRole( userItem: UserItem, newRole: Role ) {
+    if ( !isSuperAdmin.value || updatingRole.value || newRole === userItem.role ) return
+    updatingRole.value = userItem._id
+    try {
+        await useNuxtApp().$api( `/api/users/${userItem._id}`, { 
+            method : "PATCH", 
+            body   : { role: newRole } 
+        } )
+        toast.add( { 
+            title       : "Sukses", 
+            description : `Role diubah menjadi ${newRole === "super-admin" ? "Super Admin" : "Admin"}`, 
+            color       : "success" 
+        } )
+        await refreshNuxtData( "users-list" )
+    } catch {
+        toast.add( { title: "Gagal", description: "Tidak dapat mengubah role", color: "error" } )
+    } finally {
+        updatingRole.value = null
+    }
+}
+
 // User table columns
 const userColumns: TableColumn<UserItem>[] = [
     { 
@@ -264,7 +289,23 @@ const userColumns: TableColumn<UserItem>[] = [
     { 
         accessorKey : "role", 
         header      : "Role", 
-        cell        : ( { row } ) => row.original.role === "super-admin" ? "Super Admin" : "Admin" 
+        cell        : ( { row } ) => {
+            const item = row.original
+            const isCurrentUser = user.value?.email === item.email
+            
+            if ( !isSuperAdmin.value ) {
+                return h( "span", {}, item.role === "super-admin" ? "Super Admin" : "Admin" )
+            }
+            
+            return h( USelect, {
+                modelValue            : item.role,
+                items                 : roleItems,
+                disabled              : isCurrentUser || updatingRole.value === item._id,
+                loading               : updatingRole.value === item._id,
+                class                 : "w-36",
+                "onUpdate:modelValue" : ( val: Role ) => updateUserRole( item, val ),
+            } )
+        },
     },
     { 
         accessorKey : "isApproved", 
