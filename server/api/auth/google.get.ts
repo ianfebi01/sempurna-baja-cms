@@ -26,7 +26,8 @@ function sendErrorToParent( event: Parameters<typeof setHeader>[0], errorCode: s
 
 export default defineOAuthGoogleEventHandler( {
   config: {
-    scope: ["profile", "email"],
+    scope               : ["profile", "email"],
+    authorizationParams : { prompt: "select_account" },
   },
   async onSuccess( event, { user } ) {
     const client = await clientPromise
