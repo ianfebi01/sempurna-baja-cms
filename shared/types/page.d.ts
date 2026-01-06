@@ -1,8 +1,9 @@
 import type { BannerType, SectionType } from "../utils/fieldDefinitions"
 
-// ============================================
-// Section Types (Embedded in Page)
-// ============================================
+/**
+ * Section Types (Embedded in Page)
+ */
+
 
 // AboutUs Section
 export interface AboutUsItem {
@@ -75,9 +76,9 @@ export type Section =
   | ServiceSection
   | TestimoniSection
 
-// ============================================
-// Banner Types (Embedded in Page)
-// ============================================
+/**
+ * Banner Types (Embedded in Page)
+ */
 
 export interface MainHeroBanner {
   type: "mainHero"
@@ -106,9 +107,9 @@ export interface VideoHeroBanner {
 
 export type Banner = MainHeroBanner | SimpleHeroBanner | VideoHeroBanner
 
-// ============================================
-// Page Types
-// ============================================
+/**
+ * Page Types
+ */
 
 export interface Page {
   _id: string

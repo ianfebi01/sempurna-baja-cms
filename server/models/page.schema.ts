@@ -5,9 +5,9 @@ import {
   type BannerType,
 } from "~~/shared/utils/fieldDefinitions"
 
-// ============================================
-// Banner Types
-// ============================================
+/**
+ * Banner Types
+ */
 
 export const bannerTypeValues = [
   "mainHero",
@@ -17,9 +17,9 @@ export const bannerTypeValues = [
 
 export const BannerTypeZod = z.enum( bannerTypeValues )
 
-// ============================================
-// Banner Schema (embedded in page)
-// ============================================
+/**
+ * Banner Schema (embedded in page)
+ */
 
 const BaseBannerZod = z.object( {
   type: BannerTypeZod,
@@ -40,9 +40,9 @@ export function validateBannerData( type: BannerType, data: unknown ) {
   return fullSchema.safeParse( data )
 }
 
-// ============================================
-// Section Types (for embedded sections)
-// ============================================
+/**
+ * Section Types (for embedded sections)
+ */
 
 export const sectionTypeValues = [
   "aboutUs",
@@ -100,9 +100,9 @@ export function validateSections( sections: Array<{ type: string; [key: string]:
   return { errors, validatedSections }
 }
 
-// ============================================
-// Page Schema
-// ============================================
+/**
+ * Page Schema
+ */
 
 export const PageZod = z.object( {
   name            : z.string().min( 1, "Nama halaman wajib diisi" ).trim(),

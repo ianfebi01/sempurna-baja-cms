@@ -1,8 +1,8 @@
 import z from "zod"
 
-// ============================================
-// Field Definition Types
-// ============================================
+/**
+ * Field Definition Types
+ */
 
 export interface FieldDefinition {
   name: string
@@ -16,9 +16,9 @@ export interface FieldDefinition {
   arrayFields?: FieldDefinition[]
 }
 
-// ============================================
-// Banner Field Definitions
-// ============================================
+/**
+ * Banner Field Definitions
+ */
 
 export const bannerFieldsConfig: Record<string, FieldDefinition[]> = {
   mainHero: [
@@ -42,9 +42,9 @@ export const bannerFieldsConfig: Record<string, FieldDefinition[]> = {
   ],
 }
 
-// ============================================
-// Section Field Definitions
-// ============================================
+/**
+ * Section Field Definitions
+ */
 
 export const sectionFieldsConfig: Record<string, FieldDefinition[]> = {
   aboutUs: [
@@ -99,9 +99,9 @@ export const sectionFieldsConfig: Record<string, FieldDefinition[]> = {
   ],
 }
 
-// ============================================
-// Schema Generator
-// ============================================
+/**
+ * Schema Generator
+ */
 
 export function generateZodSchema( fields: FieldDefinition[] ): z.ZodObject<Record<string, z.ZodTypeAny>> {
   const shape: Record<string, z.ZodTypeAny> = {}
@@ -162,9 +162,9 @@ export function generateZodSchema( fields: FieldDefinition[] ): z.ZodObject<Reco
   return z.object( shape )
 }
 
-// ============================================
-// Generate Default Form State
-// ============================================
+/**
+ * Generate Default Form State
+ */
 
 export function generateDefaultState( fields: FieldDefinition[] ): Record<string, unknown> {
   const state: Record<string, unknown> = {}
@@ -184,9 +184,9 @@ export function generateDefaultState( fields: FieldDefinition[] ): Record<string
   return state
 }
 
-// ============================================
-// Type Helpers
-// ============================================
+/**
+ * Type Helpers
+ */
 
 export type BannerType = keyof typeof bannerFieldsConfig
 export type SectionType = keyof typeof sectionFieldsConfig
