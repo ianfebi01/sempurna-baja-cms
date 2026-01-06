@@ -1,17 +1,8 @@
 import type { BannerType, SectionType } from "../utils/fieldDefinitions"
 
 // ============================================
-// Section Types
+// Section Types (Embedded in Page)
 // ============================================
-
-export interface BaseSection {
-  _id: string
-  name: string
-  type: SectionType
-  order: number
-  createdAt: string
-  updatedAt: string
-}
 
 // AboutUs Section
 export interface AboutUsItem {
@@ -20,21 +11,21 @@ export interface AboutUsItem {
   description: string
 }
 
-export interface AboutUsSection extends BaseSection {
+export interface AboutUsSection {
   type: "aboutUs"
   title: string
   items: AboutUsItem[]
 }
 
 // Catalog Section
-export interface CatalogSection extends BaseSection {
+export interface CatalogSection {
   type: "catalog"
   title: string
   showAllLink: string
 }
 
 // ContactUs Section
-export interface ContactUsSection extends BaseSection {
+export interface ContactUsSection {
   type: "contactUs"
   title: string
   address: string
@@ -44,7 +35,7 @@ export interface ContactUsSection extends BaseSection {
 }
 
 // Quote Section
-export interface QuoteSection extends BaseSection {
+export interface QuoteSection {
   type: "quote"
   quoteText: string
   citeUrl?: string
@@ -56,7 +47,7 @@ export interface ServiceStep {
   description: string
 }
 
-export interface ServiceSection extends BaseSection {
+export interface ServiceSection {
   type: "service"
   title: string
   description: string
@@ -66,7 +57,7 @@ export interface ServiceSection extends BaseSection {
 }
 
 // Testimoni Section
-export interface TestimoniSection extends BaseSection {
+export interface TestimoniSection {
   type: "testimoni"
   title: string
   testimonialText: string
@@ -75,7 +66,7 @@ export interface TestimoniSection extends BaseSection {
   rating: number
 }
 
-// Discriminated Union
+// Discriminated Union for all Section types
 export type Section =
   | AboutUsSection
   | CatalogSection
@@ -85,14 +76,10 @@ export type Section =
   | TestimoniSection
 
 // ============================================
-// Banner Types
+// Banner Types (Embedded in Page)
 // ============================================
 
-export interface BaseBanner {
-  type: BannerType
-}
-
-export interface MainHeroBanner extends BaseBanner {
+export interface MainHeroBanner {
   type: "mainHero"
   title: string
   subtitle?: string
@@ -103,14 +90,14 @@ export interface MainHeroBanner extends BaseBanner {
   secondaryCtaLink?: string
 }
 
-export interface SimpleHeroBanner extends BaseBanner {
+export interface SimpleHeroBanner {
   type: "simpleHero"
   title: string
   subtitle?: string
   backgroundImage?: string
 }
 
-export interface VideoHeroBanner extends BaseBanner {
+export interface VideoHeroBanner {
   type: "videoHero"
   title: string
   subtitle?: string
@@ -128,7 +115,7 @@ export interface Page {
   name: string
   slug: string
   banner: Banner
-  sections: Section[] // Populated
+  sections: Section[]
   isPublished: boolean
   metaTitle?: string
   metaDescription?: string

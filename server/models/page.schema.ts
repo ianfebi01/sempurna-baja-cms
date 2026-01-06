@@ -55,6 +55,51 @@ export const sectionTypeValues = [
 
 export const SectionTypeZod = z.enum( sectionTypeValues )
 
+// Base section schema
+const BaseSectionZod = z.object( {
+  type: SectionTypeZod,
+} )
+
+// Import section field configs
+import { sectionFieldsConfig, type SectionType } from "~~/shared/utils/fieldDefinitions"
+
+// Validate section data dynamically based on type
+export function validateSectionData( type: SectionType, data: unknown ) {
+  const fields = sectionFieldsConfig[type]
+  if ( !fields ) {
+    return {
+      success : false as const,
+      error   : new z.ZodError( [{ code: "custom", message: `Tipe section tidak valid: ${type}`, path: ["type"] }] ),
+    }
+  }
+
+  const dynamicSchema = generateZodSchema( fields )
+  const fullSchema = BaseSectionZod.merge( dynamicSchema )
+
+  return fullSchema.safeParse( data )
+}
+
+// Validate all sections in a page
+export function validateSections( sections: Array<{ type: string; [key: string]: unknown }> ) {
+  const errors: Array<{ index: number; message: string }> = []
+  const validatedSections: Array<Record<string, unknown>> = []
+
+  for ( let i = 0; i < sections.length; i++ ) {
+    const section = sections[i]!
+    const type = section.type as SectionType
+    const result = validateSectionData( type, section )
+
+    if ( !result.success ) {
+      const firstError = result.error.issues[0]
+      errors.push( { index: i, message: `Section ${i + 1}: ${firstError?.message || "Invalid"}` } )
+    } else {
+      validatedSections.push( result.data as Record<string, unknown> )
+    }
+  }
+
+  return { errors, validatedSections }
+}
+
 // ============================================
 // Page Schema
 // ============================================

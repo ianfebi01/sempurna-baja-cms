@@ -1,7 +1,7 @@
 import { createError } from "h3"
 import clientPromise, { DB_NAME } from "~~/server/lib/mongodb"
 import { defineApi, fail } from "~~/server/utils/api"
-import { PAGE_COLLECTION, PageZod, validateBannerData } from "~~/server/models/page.schema"
+import { PAGE_COLLECTION, PageZod, validateBannerData, validateSections } from "~~/server/models/page.schema"
 import type { BannerType } from "~~/shared/utils/fieldDefinitions"
 
 export default defineApi( async ( event ) => {
@@ -24,6 +24,18 @@ export default defineApi( async ( event ) => {
       } )
     }
     body.banner = bannerValidation.data
+  }
+
+  // Validate each section based on its type
+  if ( body.sections?.length ) {
+    const { errors, validatedSections } = validateSections( body.sections )
+    if ( errors.length ) {
+      throw createError( {
+        statusCode    : 400,
+        statusMessage : errors[0]?.message || "Section tidak valid",
+      } )
+    }
+    body.sections = validatedSections
   }
 
   // Validate page structure
