@@ -39,6 +39,11 @@ const items = computed<NavigationMenuItem[][]>( () => {
       icon  : "fa7-solid:bag-shopping",
       href  : "/",
     },
+    {
+      label : "Halaman",
+      icon  : "fa7-solid:file",
+      href  : "/pages",
+    },
   ]
 
   if ( user.value?.role === "super-admin" ) {
