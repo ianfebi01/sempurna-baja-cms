@@ -25,6 +25,8 @@ export const bannerFieldsConfig: Record<string, FieldDefinition[]> = {
     { name: "title", label: "Judul", type: "text", required: true, placeholder: "Solusi Baja Ringan" },
     { name: "subtitle", label: "Subtitle", type: "textarea", placeholder: "Material lengkap + jasa pemasangan" },
     { name: "image", label: "Gambar", type: "image", required: true },
+    { name: "imageTitle", label: "Judul Gambar", type: "text", required: true },
+    { name: "imageSubtitle", label: "Subtitle Gambar", type: "text", required: true },
     { name: "ctaText", label: "Tombol CTA", type: "text", default: "Chat WhatsApp" },
     { name: "ctaLink", label: "Link CTA", type: "url", default: "https://wa.me/6283144512987" },
     { name: "secondaryCtaText", label: "Tombol CTA 2", type: "text" },
