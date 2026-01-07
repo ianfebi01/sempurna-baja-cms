@@ -60,9 +60,6 @@ const BaseSectionZod = z.object( {
   type: SectionTypeZod,
 } )
 
-// Import section field configs
-import { sectionFieldsConfig, type SectionType } from "~~/shared/utils/fieldDefinitions"
-
 // Validate section data dynamically based on type
 export function validateSectionData( type: SectionType, data: unknown ) {
   const fields = sectionFieldsConfig[type]

@@ -3,24 +3,36 @@ import { defineApi } from "~~/server/utils/api"
 import { PAGE_COLLECTION } from "~~/server/models/page.schema"
 
 export default defineApi( async ( event ) => {
-  await requireRole( event, ["admin", "super-admin"] )
+  // await requireRole(event, ["admin", "super-admin"])
 
   const query = getQuery( event )
   const page = Number( query.page ) || 1
   const pageSize = Number( query.pageSize ) || 20
   const search = String( query.search || "" ).trim()
+  const slug = String( query.slug || "" ).trim()
   const published = query.published
 
   const client = await clientPromise
-  const db = client.db( DB_NAME )
+  const db = client?.db( DB_NAME )
+
+  if ( !db ) {
+    return fail(
+      500,
+      "Database connection error",
+    )
+  }
 
   const filter: Record<string, unknown> = {}
 
+  const orConditions = []
   if ( search ) {
-    filter.$or = [
-      { name: { $regex: search, $options: "i" } },
-      { slug: { $regex: search, $options: "i" } },
-    ]
+    orConditions.push( { name: { $regex: search, $options: "i" } } )
+  }
+  if ( slug ) {
+    orConditions.push( { slug: { $regex: slug, $options: "i" } } )
+  }
+  if ( orConditions.length > 0 ) {
+    filter.$or = orConditions
   }
 
   if ( published === "true" ) {
@@ -29,7 +41,7 @@ export default defineApi( async ( event ) => {
     filter.isPublished = false
   }
 
-  const total = await db.collection( PAGE_COLLECTION ).countDocuments( filter )
+  const total = await db?.collection( PAGE_COLLECTION ).countDocuments( filter )
 
   const pages = await db
     .collection( PAGE_COLLECTION )

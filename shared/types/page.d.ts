@@ -1,5 +1,3 @@
-import type { BannerType, SectionType } from "../utils/fieldDefinitions"
-
 /**
  * Section Types (Embedded in Page)
  */
