@@ -7,7 +7,7 @@ import z from "zod"
 export interface FieldDefinition {
   name: string
   label: string
-  type: "text" | "textarea" | "image" | "number" | "url" | "array"
+  type: "text" | "textarea" | "image" | "number" | "url" | "array" | "icon"
   required?: boolean
   default?: unknown
   min?: number
@@ -29,8 +29,10 @@ export const bannerFieldsConfig: Record<string, FieldDefinition[]> = {
     { name: "imageSubtitle", label: "Subtitle Gambar", type: "text", required: true },
     { name: "ctaText", label: "Tombol CTA", type: "text", default: "Chat WhatsApp" },
     { name: "ctaLink", label: "Link CTA", type: "url", default: "https://wa.me/6283144512987" },
+    { name: "ctaIcon", label: "Icon CTA", type: "icon", default: "fa7-solid:paper-plane" },
     { name: "secondaryCtaText", label: "Tombol CTA 2", type: "text" },
     { name: "secondaryCtaLink", label: "Link CTA 2", type: "url" },
+    { name: "secondaryCtaIcon", label: "Icon CTA 2", type: "icon", default: "fa7-solid:images" },
   ],
   simpleHero: [
     { name: "title", label: "Judul", type: "text", required: true },
@@ -126,6 +128,10 @@ export function generateZodSchema( fields: FieldDefinition[] ): z.ZodObject<Reco
       }
       case "image": {
         fieldSchema = z.string().min( 1, `${field.label} wajib diisi` )
+        break
+      }
+      case "icon": {
+        fieldSchema = z.string()
         break
       }
       case "number": {

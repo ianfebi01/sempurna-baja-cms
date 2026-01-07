@@ -193,6 +193,18 @@ function clearImage( fieldName: string ) {
         </div>
       </UFormField>
 
+      <!-- Icon Selector -->
+      <UFormField
+        v-else-if="field.type === 'icon'"
+        :label="field.label"
+        :name="field.name"
+        :required="field.required">
+        <IconSelector
+          :model-value="(modelValue[field.name] as string) || ''"
+          :disabled="disabled"
+          @update:model-value="updateField(field.name, $event)" />
+      </UFormField>
+
       <!-- Array (nested items) -->
       <div v-else-if="field.type === 'array'" class="border border-default rounded-lg p-4">
         <div class="flex items-center justify-between mb-4">
