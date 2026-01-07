@@ -83,6 +83,8 @@ export interface MainHeroBanner {
   title: string
   subtitle?: string
   image: string
+  imageTitle: string
+  imageSubtitle: string
   ctaText?: string
   ctaLink?: string
   secondaryCtaText?: string
