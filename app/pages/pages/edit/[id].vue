@@ -320,7 +320,7 @@ async function onSubmit() {
             to="/pages" />
           <UButton
             label="Simpan"
-            color="primary"
+            color="neutral"
             type="submit"
             :loading="isLoading" />
         </div>

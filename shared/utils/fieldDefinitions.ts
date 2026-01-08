@@ -177,6 +177,7 @@ export function generateZodSchema( fields: FieldDefinition[] ): z.ZodObject<Reco
       case "text":
       case "textarea": {
         let s = z.string()
+        if ( field.required ) s = s.min( 1, `${field.label} wajib diisi` )
         if ( field.min ) s = s.min( field.min, `${field.label} minimal ${field.min} karakter` )
         if ( field.max ) s = s.max( field.max, `${field.label} maksimal ${field.max} karakter` )
         fieldSchema = s
