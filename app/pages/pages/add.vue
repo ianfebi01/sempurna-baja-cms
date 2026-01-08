@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import type { FormSubmitEvent } from "@nuxt/ui"
 import type { ApiError } from "~~/shared/types"
 import {
   bannerFieldsConfig,
@@ -126,7 +125,7 @@ function getSectionTypeLabel( type: SectionType ): string {
   return sectionTypes.find( ( t ) => t.value === type )?.label || type
 }
 
-async function onSubmit( event: FormSubmitEvent<z.output<typeof formSchema.value>> ) {
+async function onSubmit() {
   isLoading.value = true
 
   try {

@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { z } from "zod"
 import { generateFieldSchema, type FieldDefinition } from "~~/shared/utils/fieldDefinitions"
 
 const props = defineProps<{
@@ -36,7 +35,8 @@ function validateField( fieldName: string ) {
     const issues = result.error?.issues || []
     fieldErrors.value[fieldName] = issues[0]?.message || "Nilai tidak valid"
   } else {
-    delete fieldErrors.value[fieldName]
+    const { [fieldName]: _, ...rest } = fieldErrors.value
+    fieldErrors.value = rest
   }
 }
 
@@ -44,7 +44,8 @@ function validateField( fieldName: string ) {
 function updateField( name: string, value: unknown ) {
   // Clear error on change
   if ( fieldErrors.value[name] ) {
-    delete fieldErrors.value[name]
+    const { [name]: _, ...rest } = fieldErrors.value
+    fieldErrors.value = rest
   }
   emit( "update:modelValue", { ...props.modelValue, [name]: value } )
 }
@@ -104,7 +105,8 @@ async function uploadImage( fieldName: string, file: File ) {
       updateField( fieldName, response.url )
       // Clear any image validation error after successful upload
       if ( fieldErrors.value[fieldName] ) {
-        delete fieldErrors.value[fieldName]
+        const { [fieldName]: _, ...rest } = fieldErrors.value
+        fieldErrors.value = rest
       }
       toast.add( { title: "Sukses", description: "Gambar berhasil diunggah", color: "success" } )
     } else {

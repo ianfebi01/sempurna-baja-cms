@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import type { FormSubmitEvent } from "@nuxt/ui"
 import type { ApiError, ApiSuccess } from "~~/shared/types"
 import {
   bannerFieldsConfig,
@@ -61,11 +60,11 @@ const bannerState = ref<Record<string, unknown>>( {
 
 
 // Generate dynamic banner schema
-const bannerSchema = computed( () => {
-  const fields = bannerFieldsConfig[bannerType.value] || []
-  const dynamicSchema = generateZodSchema( fields )
-  return z.object( { type: z.string() } ).merge( dynamicSchema )
-} )
+// const bannerSchema = computed( () => {
+//   const fields = bannerFieldsConfig[bannerType.value] || []
+//   const dynamicSchema = generateZodSchema( fields )
+//   return z.object( { type: z.string() } ).merge( dynamicSchema )
+// } )
 
 // Generate dynamic sections schema
 const sectionsSchema = computed( () => {
@@ -155,7 +154,7 @@ function getSectionTypeLabel( type: SectionType ): string {
   return sectionTypes.find( ( t ) => t.value === type )?.label || type
 }
 
-async function onSubmit( event: FormSubmitEvent<z.output<typeof formSchema.value>> ) {
+async function onSubmit() {
   isLoading.value = true
 
   try {

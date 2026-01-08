@@ -6,10 +6,10 @@ export default defineVitestConfig( {
     globals     : true,
     include     : ["tests/**/*.test.ts"],
     coverage    : {
-      provider  : "v8",
-      reporter  : ["text", "html"],
-      include   : ["server/utils/**", "shared/utils/**", "app/composables/**"],
-      exclude   : ["node_modules", "tests", ".nuxt"],
+      provider : "v8",
+      reporter : ["text", "html"],
+      include  : ["server/utils/**", "shared/utils/**", "app/composables/**"],
+      exclude  : ["node_modules", "tests", ".nuxt"],
     },
   },
 } )
