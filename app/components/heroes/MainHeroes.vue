@@ -34,9 +34,9 @@
 
         <div class="absolute bottom-0 z-10 text-white/90 w-full inset-x-0">
           <!-- overlay shadow bottom -->
-          <div class="absolute w-full bottom-0 bg-gradient-to-t from-[#000]/80 to-transparent h-full z-0">
+          <div class="absolute w-full bottom-0 bg-linear-to-t from-[#000]/80 to-transparent h-full z-0">
           </div>
-          <div class="p-4 lg:p-8 relative z-[1] mt-4">
+          <div class="p-4 lg:p-8 relative z-1 mt-4">
             <p class="h2 m-0">{{ banner?.imageTitle || 'Sempurna Baja' }}</p>
             <p class="m-0">{{ banner?.imageSubtitle || 'Galvalum 0.30' }}</p>
           </div>
