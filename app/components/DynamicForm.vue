@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import type { FieldDefinition } from "~~/shared/utils/fieldDefinitions"
+import { z } from "zod"
+import { generateFieldSchema, type FieldDefinition } from "~~/shared/utils/fieldDefinitions"
 
 const props = defineProps<{
   fields: FieldDefinition[]
@@ -13,7 +14,38 @@ const emit = defineEmits<{
 
 const toast = useToast()
 
+// Track field errors
+const fieldErrors = ref<Record<string, string>>( {} )
+
+// Get field definition by name
+function getFieldByName( fieldName: string ): FieldDefinition | undefined {
+  return props.fields.find( ( f ) => f.name === fieldName )
+}
+
+// Validate a single field on blur
+function validateField( fieldName: string ) {
+  const field = getFieldByName( fieldName )
+  if ( !field ) return
+
+  const fieldSchema = generateFieldSchema( field )
+  const value = props.modelValue[fieldName]
+  const result = fieldSchema.safeParse( value )
+
+  if ( !result.success ) {
+    // Zod 4 uses .issues instead of .errors
+    const issues = result.error?.issues || []
+    fieldErrors.value[fieldName] = issues[0]?.message || "Nilai tidak valid"
+  } else {
+    delete fieldErrors.value[fieldName]
+  }
+}
+
+// Clear error when field value changes
 function updateField( name: string, value: unknown ) {
+  // Clear error on change
+  if ( fieldErrors.value[name] ) {
+    delete fieldErrors.value[name]
+  }
   emit( "update:modelValue", { ...props.modelValue, [name]: value } )
 }
 
@@ -70,6 +102,10 @@ async function uploadImage( fieldName: string, file: File ) {
 
     if ( response?.url ) {
       updateField( fieldName, response.url )
+      // Clear any image validation error after successful upload
+      if ( fieldErrors.value[fieldName] ) {
+        delete fieldErrors.value[fieldName]
+      }
       toast.add( { title: "Sukses", description: "Gambar berhasil diunggah", color: "success" } )
     } else {
       console.error( "No URL in response:", response )
@@ -85,6 +121,8 @@ async function uploadImage( fieldName: string, file: File ) {
 
 function clearImage( fieldName: string ) {
   updateField( fieldName, "" )
+  // Validate after clearing to show required error if applicable
+  nextTick( () => validateField( fieldName ) )
 }
 </script>
 
@@ -96,13 +134,15 @@ function clearImage( fieldName: string ) {
         v-if="field.type === 'text'"
         :label="field.label"
         :name="field.name"
-        :required="field.required">
+        :required="field.required"
+        :error="fieldErrors[field.name]">
         <UInput
           :model-value="(modelValue[field.name] as string) || ''"
           :placeholder="field.placeholder"
           :disabled="disabled"
           class="w-full"
-          @update:model-value="updateField(field.name, $event)" />
+          @update:model-value="updateField(field.name, $event)"
+          @blur="validateField(field.name)" />
       </UFormField>
 
       <!-- Textarea -->
@@ -110,13 +150,15 @@ function clearImage( fieldName: string ) {
         v-else-if="field.type === 'textarea'"
         :label="field.label"
         :name="field.name"
-        :required="field.required">
+        :required="field.required"
+        :error="fieldErrors[field.name]">
         <UTextarea
           :model-value="(modelValue[field.name] as string) || ''"
           :placeholder="field.placeholder"
           :disabled="disabled"
           class="w-full"
-          @update:model-value="updateField(field.name, $event)" />
+          @update:model-value="updateField(field.name, $event)"
+          @blur="validateField(field.name)" />
       </UFormField>
 
       <!-- URL Input -->
@@ -124,14 +166,15 @@ function clearImage( fieldName: string ) {
         v-else-if="field.type === 'url'"
         :label="field.label"
         :name="field.name"
-        :required="field.required">
+        :required="field.required"
+        :error="fieldErrors[field.name]">
         <UInput
           :model-value="(modelValue[field.name] as string) || ''"
           :placeholder="field.placeholder || 'https://'"
           :disabled="disabled"
-          type="url"
           class="w-full"
-          @update:model-value="updateField(field.name, $event)" />
+          @update:model-value="updateField(field.name, $event)"
+          @blur="validateField(field.name)" />
       </UFormField>
 
       <!-- Number Input -->
@@ -139,14 +182,16 @@ function clearImage( fieldName: string ) {
         v-else-if="field.type === 'number'"
         :label="field.label"
         :name="field.name"
-        :required="field.required">
+        :required="field.required"
+        :error="fieldErrors[field.name]">
         <UInputNumber
           :model-value="(modelValue[field.name] as number) || 0"
           :min="field.min"
           :max="field.max"
           :disabled="disabled"
           class="w-full"
-          @update:model-value="updateField(field.name, $event)" />
+          @update:model-value="updateField(field.name, $event)"
+          @blur="validateField(field.name)" />
       </UFormField>
 
       <!-- Image Upload -->
@@ -154,7 +199,8 @@ function clearImage( fieldName: string ) {
         v-else-if="field.type === 'image'"
         :label="field.label"
         :name="field.name"
-        :required="field.required">
+        :required="field.required"
+        :error="fieldErrors[field.name]">
         <div class="space-y-3">
           <!-- Show preview if already uploaded -->
           <div v-if="modelValue[field.name]" class="mb-2 relative w-full max-w-xs aspect-square">
@@ -198,7 +244,8 @@ function clearImage( fieldName: string ) {
         v-else-if="field.type === 'icon'"
         :label="field.label"
         :name="field.name"
-        :required="field.required">
+        :required="field.required"
+        :error="fieldErrors[field.name]">
         <IconSelector
           :model-value="(modelValue[field.name] as string) || ''"
           :disabled="disabled"

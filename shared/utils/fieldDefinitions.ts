@@ -104,6 +104,66 @@ export const sectionFieldsConfig: Record<string, FieldDefinition[]> = {
 }
 
 /**
+ * Generate Zod schema for a single field (used for individual field validation)
+ */
+export function generateFieldSchema( field: FieldDefinition ): z.ZodTypeAny {
+  let fieldSchema: z.ZodTypeAny
+
+  switch ( field.type ) {
+    case "text":
+    case "textarea": {
+      let s = z.string()
+      if ( field.required ) s = s.min( 1, `${field.label} wajib diisi` )
+      if ( field.min ) s = s.min( field.min, `${field.label} minimal ${field.min} karakter` )
+      if ( field.max ) s = s.max( field.max, `${field.label} maksimal ${field.max} karakter` )
+      fieldSchema = s
+      break
+    }
+    case "url": {
+      let s = z.string()
+      if ( field.required ) {
+        s = s.min( 1, `${field.label} wajib diisi` )
+      }
+      fieldSchema = s.refine(
+        ( val ) => val === "" || val.startsWith( "#" ) || z.string().url().safeParse( val ).success,
+        { message: `${field.label} harus URL atau anchor yang valid` }
+      )
+      break
+    }
+    case "image": {
+      fieldSchema = field.required
+        ? z.string().min( 1, `${field.label} wajib diisi` )
+        : z.string()
+      break
+    }
+    case "icon": {
+      fieldSchema = z.string()
+      break
+    }
+    case "number": {
+      let n = z.number()
+      if ( field.min !== undefined ) n = n.min( field.min, `${field.label} minimal ${field.min}` )
+      if ( field.max !== undefined ) n = n.max( field.max, `${field.label} maksimal ${field.max}` )
+      fieldSchema = n
+      break
+    }
+    case "array": {
+      if ( field.arrayFields ) {
+        const itemSchema = generateZodSchema( field.arrayFields )
+        fieldSchema = z.array( itemSchema ).min( 1, `${field.label} minimal 1 item` )
+      } else {
+        fieldSchema = z.array( z.any() )
+      }
+      break
+    }
+    default:
+      fieldSchema = z.any()
+  }
+
+  return fieldSchema
+}
+
+/**
  * Schema Generator
  */
 
@@ -123,7 +183,10 @@ export function generateZodSchema( fields: FieldDefinition[] ): z.ZodObject<Reco
         break
       }
       case "url": {
-        fieldSchema = z.string().url( `${field.label} harus URL yang valid` )
+        fieldSchema = z.string().refine(
+          ( val ) => val.startsWith( "#" ) || z.string().url().safeParse( val ).success,
+          { message: `${field.label} harus URL atau anchor yang valid` }
+        )
         break
       }
       case "image": {

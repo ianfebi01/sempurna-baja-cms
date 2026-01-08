@@ -7,9 +7,11 @@ import {
   sectionFieldsConfig,
   sectionTypes,
   generateDefaultState,
+  generateZodSchema,
   type BannerType,
   type SectionType,
 } from "~~/shared/utils/fieldDefinitions"
+import { z } from "zod"
 
 definePageMeta( {
   layout     : "default",
@@ -56,6 +58,39 @@ const bannerState = ref<Record<string, unknown>>( {
   type: "mainHero",
   ...generateDefaultState( bannerFieldsConfig.mainHero || [] ),
 } )
+
+
+// Generate dynamic banner schema
+const bannerSchema = computed( () => {
+  const fields = bannerFieldsConfig[bannerType.value] || []
+  const dynamicSchema = generateZodSchema( fields )
+  return z.object( { type: z.string() } ).merge( dynamicSchema )
+} )
+
+// Generate dynamic sections schema
+const sectionsSchema = computed( () => {
+  const sectionSchemas = state.sections.map( ( section ) => {
+    const fields = sectionFieldsConfig[section.type] || []
+    const dynamicSchema = generateZodSchema( fields )
+    return z.object( { type: z.literal( section.type ) } ).merge( dynamicSchema )
+  } )
+
+  if ( sectionSchemas.length === 0 ) return z.array( z.any() )
+  if ( sectionSchemas.length === 1 ) return z.array( sectionSchemas[0]! )
+
+  const [first, second, ...rest] = sectionSchemas
+  return z.array( z.union( [first!, second!, ...rest] ) )
+} )
+
+// Full page form schema
+const formSchema = computed( () => z.object( {
+  name            : z.string().min( 1, "Nama halaman wajib diisi" ),
+  slug            : z.string().min( 1, "Slug wajib diisi" ).regex( /^[a-z0-9-]+$/, "Slug hanya boleh berisi huruf kecil, angka, dan tanda hubung" ),
+  isPublished     : z.boolean(),
+  metaTitle       : z.string().optional().or( z.literal( "" ) ),
+  metaDescription : z.string().optional().or( z.literal( "" ) ),
+  sections        : sectionsSchema.value,
+} ) )
 
 // Populate form when data loads
 watch( pageData, ( data ) => {
@@ -120,7 +155,7 @@ function getSectionTypeLabel( type: SectionType ): string {
   return sectionTypes.find( ( t ) => t.value === type )?.label || type
 }
 
-async function onSubmit( _event: FormSubmitEvent<typeof state> ) {
+async function onSubmit( event: FormSubmitEvent<z.output<typeof formSchema.value>> ) {
   isLoading.value = true
 
   try {
@@ -165,6 +200,7 @@ async function onSubmit( _event: FormSubmitEvent<typeof state> ) {
       <UForm
         v-else
         :state="state"
+        :schema="formSchema"
         class="space-y-6 max-w-4xl"
         :disabled="isLoading"
         @submit="onSubmit">
