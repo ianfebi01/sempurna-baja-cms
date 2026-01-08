@@ -125,7 +125,7 @@ export function generateFieldSchema( field: FieldDefinition ): z.ZodTypeAny {
         s = s.min( 1, `${field.label} wajib diisi` )
       }
       fieldSchema = s.refine(
-        ( val ) => val === "" || val.startsWith( "#" ) || z.string().url().safeParse( val ).success,
+        ( val ) => val === "" || val.startsWith( "#" ) || val.startsWith( "/" ) || z.string().url().safeParse( val ).success,
         { message: `${field.label} harus URL atau anchor yang valid` },
       )
       break
@@ -185,7 +185,7 @@ export function generateZodSchema( fields: FieldDefinition[] ): z.ZodObject<Reco
       }
       case "url": {
         fieldSchema = z.string().refine(
-          ( val ) => val.startsWith( "#" ) || z.string().url().safeParse( val ).success,
+          ( val ) => val.startsWith( "#" ) || val.startsWith( "/" ) || z.string().url().safeParse( val ).success,
           { message: `${field.label} harus URL atau anchor yang valid` },
         )
         break
