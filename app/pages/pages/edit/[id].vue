@@ -58,13 +58,15 @@ const bannerState = ref<Record<string, unknown>>( {
   ...generateDefaultState( bannerFieldsConfig.mainHero || [] ),
 } )
 
+// Ref to DynamicForm for banner validation
+const bannerFormRef = ref<{ validate: () => boolean } | null>( null )
 
 // Generate dynamic banner schema
-// const bannerSchema = computed( () => {
-//   const fields = bannerFieldsConfig[bannerType.value] || []
-//   const dynamicSchema = generateZodSchema( fields )
-//   return z.object( { type: z.string() } ).merge( dynamicSchema )
-// } )
+const bannerSchema = computed( () => {
+  const fields = bannerFieldsConfig[bannerType.value] || []
+  const dynamicSchema = generateZodSchema( fields )
+  return z.object( { type: z.string() } ).merge( dynamicSchema )
+} )
 
 // Generate dynamic sections schema
 const sectionsSchema = computed( () => {
@@ -81,7 +83,7 @@ const sectionsSchema = computed( () => {
   return z.array( z.union( [first!, second!, ...rest] ) )
 } )
 
-// Full page form schema
+// Full page form schema (includes banner for validation)
 const formSchema = computed( () => z.object( {
   name            : z.string().min( 1, "Nama halaman wajib diisi" ),
   slug            : z.string().min( 1, "Slug wajib diisi" ).regex( /^[a-z0-9-]+$/, "Slug hanya boleh berisi huruf kecil, angka, dan tanda hubung" ),
@@ -89,6 +91,13 @@ const formSchema = computed( () => z.object( {
   metaTitle       : z.string().optional().or( z.literal( "" ) ),
   metaDescription : z.string().optional().or( z.literal( "" ) ),
   sections        : sectionsSchema.value,
+  banner          : bannerSchema.value,
+} ) )
+
+// Combined form state for UForm validation
+const formState = computed( () => ( {
+  ...state,
+  banner: bannerState.value,
 } ) )
 
 // Populate form when data loads
@@ -155,6 +164,11 @@ function getSectionTypeLabel( type: SectionType ): string {
 }
 
 async function onSubmit() {
+  // Validate banner fields first
+  if ( bannerFormRef.value && !bannerFormRef.value.validate() ) {
+    return // Stop submission if banner validation fails
+  }
+
   isLoading.value = true
 
   try {
@@ -198,7 +212,7 @@ async function onSubmit() {
 
       <UForm
         v-else
-        :state="state"
+        :state="formState"
         :schema="formSchema"
         class="space-y-6 max-w-4xl"
         :disabled="isLoading"
@@ -227,8 +241,10 @@ async function onSubmit() {
           </UFormField>
 
           <DynamicForm
+            ref="bannerFormRef"
             :fields="bannerFieldsConfig[bannerType] || []"
             :model-value="bannerState"
+            name-prefix="banner"
             @update:model-value="bannerState = $event" />
         </div>
 
@@ -293,6 +309,7 @@ async function onSubmit() {
               <DynamicForm
                 :fields="sectionFieldsConfig[section.type] || []"
                 :model-value="section"
+                :name-prefix="`sections.${idx}`"
                 @update:model-value="updateSection(idx, $event)" />
             </div>
           </div>

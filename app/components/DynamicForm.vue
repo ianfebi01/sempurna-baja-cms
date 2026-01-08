@@ -5,6 +5,7 @@ const props = defineProps<{
   fields: FieldDefinition[]
   modelValue: Record<string, unknown>
   disabled?: boolean
+  namePrefix?: string // e.g., "banner" for banner.title paths
 }>()
 
 const emit = defineEmits<{
@@ -19,6 +20,11 @@ const fieldErrors = ref<Record<string, string>>( {} )
 // Get field definition by name
 function getFieldByName( fieldName: string ): FieldDefinition | undefined {
   return props.fields.find( ( f ) => f.name === fieldName )
+}
+
+// Get the full field path for UFormField name (with prefix if provided)
+function getFieldPath( fieldName: string ): string {
+  return props.namePrefix ? `${props.namePrefix}.${fieldName}` : fieldName
 }
 
 // Validate a single field on blur
@@ -39,6 +45,31 @@ function validateField( fieldName: string ) {
     fieldErrors.value = rest
   }
 }
+
+// Validate all fields at once (called by parent before submit)
+function validate(): boolean {
+  let isValid = true
+
+  for ( const field of props.fields ) {
+    const fieldSchema = generateFieldSchema( field )
+    const value = props.modelValue[field.name]
+    const result = fieldSchema.safeParse( value )
+
+    if ( !result.success ) {
+      const issues = result.error?.issues || []
+      fieldErrors.value[field.name] = issues[0]?.message || "Nilai tidak valid"
+      isValid = false
+    } else {
+      const { [field.name]: _, ...rest } = fieldErrors.value
+      fieldErrors.value = rest
+    }
+  }
+
+  return isValid
+}
+
+// Expose validate method for parent component
+defineExpose( { validate } )
 
 // Clear error when field value changes
 function updateField( name: string, value: unknown ) {
@@ -135,7 +166,7 @@ function clearImage( fieldName: string ) {
       <UFormField
         v-if="field.type === 'text'"
         :label="field.label"
-        :name="field.name"
+        :name="getFieldPath(field.name)"
         :required="field.required"
         :error="fieldErrors[field.name]">
         <UInput
@@ -151,7 +182,7 @@ function clearImage( fieldName: string ) {
       <UFormField
         v-else-if="field.type === 'textarea'"
         :label="field.label"
-        :name="field.name"
+        :name="getFieldPath(field.name)"
         :required="field.required"
         :error="fieldErrors[field.name]">
         <UTextarea
@@ -167,7 +198,7 @@ function clearImage( fieldName: string ) {
       <UFormField
         v-else-if="field.type === 'url'"
         :label="field.label"
-        :name="field.name"
+        :name="getFieldPath(field.name)"
         :required="field.required"
         :error="fieldErrors[field.name]">
         <UInput
@@ -183,7 +214,7 @@ function clearImage( fieldName: string ) {
       <UFormField
         v-else-if="field.type === 'number'"
         :label="field.label"
-        :name="field.name"
+        :name="getFieldPath(field.name)"
         :required="field.required"
         :error="fieldErrors[field.name]">
         <UInputNumber
@@ -200,7 +231,7 @@ function clearImage( fieldName: string ) {
       <UFormField
         v-else-if="field.type === 'image'"
         :label="field.label"
-        :name="field.name"
+        :name="getFieldPath(field.name)"
         :required="field.required"
         :error="fieldErrors[field.name]">
         <div class="space-y-3">
@@ -245,7 +276,7 @@ function clearImage( fieldName: string ) {
       <UFormField
         v-else-if="field.type === 'icon'"
         :label="field.label"
-        :name="field.name"
+        :name="getFieldPath(field.name)"
         :required="field.required"
         :error="fieldErrors[field.name]">
         <IconSelector
