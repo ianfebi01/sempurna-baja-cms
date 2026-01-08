@@ -17,34 +17,34 @@
     </template>
 
     <template #body>
-      <div class="flex flex-wrap items-center justify-between gap-1.5 mb-4">
-        <UInput
-          :model-value="(table?.tableApi?.getColumn('name')?.getFilterValue() as string)"
-          class="max-w-sm"
-          icon="i-lucide-search"
-          placeholder="Cari halaman..."
-          :ui="{trailing: 'pe-1'}"
-          :loading="status === 'pending'"
-          @update:model-value="table?.tableApi?.getColumn('name')?.setFilterValue($event)">
-          <template v-if="(table?.tableApi?.getColumn('name')?.getFilterValue() as string)?.length" #trailing>
-            <UButton
-              color="neutral"
-              variant="link"
-              size="sm"
-              icon="i-lucide-circle-x"
-              aria-label="Clear input"
-              @click="(table?.tableApi?.getColumn('name')?.setFilterValue(''))" />
-          </template>
-        </UInput>
-
-        <USelect
-          v-model="publishedFilter"
-          :items="publishedOptions"
-          placeholder="Status"
-          class="min-w-28" />
-      </div>
-
       <ClientOnly>
+        <div class="flex flex-wrap items-center justify-between gap-1.5 mb-4">
+          <UInput
+            :model-value="(table?.tableApi?.getColumn('name')?.getFilterValue() as string)"
+            class="max-w-sm"
+            icon="i-lucide-search"
+            placeholder="Cari halaman..."
+            :ui="{ trailing: 'pe-1' }"
+            :loading="status === 'pending'"
+            @update:model-value="table?.tableApi?.getColumn('name')?.setFilterValue($event)">
+            <template v-if="(table?.tableApi?.getColumn('name')?.getFilterValue() as string)?.length" #trailing>
+              <UButton
+                color="neutral"
+                variant="link"
+                size="sm"
+                icon="i-lucide-circle-x"
+                aria-label="Clear input"
+                @click="(table?.tableApi?.getColumn('name')?.setFilterValue(''))" />
+            </template>
+          </UInput>
+
+          <USelect
+            v-model="publishedFilter"
+            :items="publishedOptions"
+            placeholder="Status"
+            class="min-w-28" />
+        </div>
+
         <UTable
           ref="table"
           v-model:column-filters="columnFilters"
