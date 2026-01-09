@@ -94,6 +94,17 @@ export const sectionFieldsConfig: Record<string, FieldDefinition[]> = {
     { name: "ctaText", label: "Tombol CTA", type: "text", default: "Pesan sekarang" },
     { name: "ctaLink", label: "Link CTA", type: "url", default: "https://wa.me/6283144512987" },
   ],
+  bodyCopy: [
+    { name: "title", label: "Judul", type: "text", required: true },
+    {
+      name        : "items",
+      label       : "Items",
+      type        : "array",
+      arrayFields : [
+        { name: "content", label: "Konten", type: "markdown", required: true },
+      ],
+    },
+  ],
   testimoni: [
     { name: "title", label: "Judul", type: "text", default: "Testimoni Pelanggan" },
     { name: "testimonialText", label: "Teks Testimoni", type: "textarea", required: true },
@@ -276,4 +287,5 @@ export const sectionTypes: { label: string; value: SectionType }[] = [
   { label: "Quote", value: "quote" },
   { label: "Jasa / Layanan", value: "service" },
   { label: "Testimoni", value: "testimoni" },
+  { label: "Body Copy", value: "bodyCopy" },
 ]
