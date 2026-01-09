@@ -12,10 +12,10 @@ import {
 } from "~~/shared/utils/fieldDefinitions"
 import { z } from "zod"
 
-definePageMeta({
-  layout: "default",
-  middleware: "auth",
-})
+definePageMeta( {
+  layout     : "default",
+  middleware : "auth",
+} )
 
 const route = useRoute()
 const router = useRouter()
@@ -23,7 +23,7 @@ const toast = useToast()
 
 const pageId = route.params.id as string
 
-const isLoading = ref(false)
+const isLoading = ref( false )
 
 // Load page data
 const { data: pageData, status: pageStatus } = await useAPI<ApiSuccess<{
@@ -40,69 +40,69 @@ const { data: pageData, status: pageStatus } = await useAPI<ApiSuccess<{
 )
 
 // Banner type
-const bannerType = ref<BannerType>("mainHero")
+const bannerType = ref<BannerType>( "mainHero" )
 
 // Form state
-const state = reactive({
-  name: "",
-  slug: "",
-  isPublished: false,
-  metaTitle: "",
-  metaDescription: "",
-  sections: [] as Array<{ type: SectionType;[key: string]: unknown }>,
-})
+const state = reactive( {
+  name            : "",
+  slug            : "",
+  isPublished     : false,
+  metaTitle       : "",
+  metaDescription : "",
+  sections        : [] as Array<{ type: SectionType;[key: string]: unknown }>,
+} )
 
 // Banner form state
-const bannerState = ref<Record<string, unknown>>({
+const bannerState = ref<Record<string, unknown>>( {
   type: "mainHero",
-  ...generateDefaultState(bannerFieldsConfig.mainHero || []),
-})
+  ...generateDefaultState( bannerFieldsConfig.mainHero || [] ),
+} )
 
 // Ref to DynamicForm for banner validation
-const bannerFormRef = ref<{ validate: () => boolean } | null>(null)
+const bannerFormRef = ref<{ validate: () => boolean } | null>( null )
 
 // Generate dynamic banner schema
-const bannerSchema = computed(() => {
+const bannerSchema = computed( () => {
   const fields = bannerFieldsConfig[bannerType.value] || []
-  const dynamicSchema = generateZodSchema(fields)
-  return z.object({ type: z.string() }).merge(dynamicSchema)
-})
+  const dynamicSchema = generateZodSchema( fields )
+  return z.object( { type: z.string() } ).merge( dynamicSchema )
+} )
 
 // Generate dynamic sections schema
-const sectionsSchema = computed(() => {
-  const sectionSchemas = state.sections.map((section) => {
+const sectionsSchema = computed( () => {
+  const sectionSchemas = state.sections.map( ( section ) => {
     const fields = sectionFieldsConfig[section.type] || []
-    const dynamicSchema = generateZodSchema(fields)
-    return z.object({ type: z.literal(section.type) }).merge(dynamicSchema)
-  })
+    const dynamicSchema = generateZodSchema( fields )
+    return z.object( { type: z.literal( section.type ) } ).merge( dynamicSchema )
+  } )
 
-  if (sectionSchemas.length === 0) return z.array(z.any())
-  if (sectionSchemas.length === 1) return z.array(sectionSchemas[0]!)
+  if ( sectionSchemas.length === 0 ) return z.array( z.any() )
+  if ( sectionSchemas.length === 1 ) return z.array( sectionSchemas[0]! )
 
   const [first, second, ...rest] = sectionSchemas
-  return z.array(z.union([first!, second!, ...rest]))
-})
+  return z.array( z.union( [first!, second!, ...rest] ) )
+} )
 
 // Full page form schema (includes banner for validation)
-const formSchema = computed(() => z.object({
-  name: z.string().min(1, "Nama halaman wajib diisi"),
-  slug: z.string().min(1, "Slug wajib diisi").regex(/^[a-z0-9-]+$/, "Slug hanya boleh berisi huruf kecil, angka, dan tanda hubung"),
-  isPublished: z.boolean(),
-  metaTitle: z.string().optional().or(z.literal("")),
-  metaDescription: z.string().optional().or(z.literal("")),
-  sections: sectionsSchema.value,
-  banner: bannerSchema.value,
-}))
+const formSchema = computed( () => z.object( {
+  name            : z.string().min( 1, "Nama halaman wajib diisi" ),
+  slug            : z.string().min( 1, "Slug wajib diisi" ).regex( /^[a-z0-9-]+$/, "Slug hanya boleh berisi huruf kecil, angka, dan tanda hubung" ),
+  isPublished     : z.boolean(),
+  metaTitle       : z.string().optional().or( z.literal( "" ) ),
+  metaDescription : z.string().optional().or( z.literal( "" ) ),
+  sections        : sectionsSchema.value,
+  banner          : bannerSchema.value,
+} ) )
 
 // Combined form state for UForm validation
-const formState = computed(() => ({
+const formState = computed( () => ( {
   ...state,
   banner: bannerState.value,
-}))
+} ) )
 
 // Populate form when data loads
-watch(pageData, (data) => {
-  if (data?.data) {
+watch( pageData, ( data ) => {
+  if ( data?.data ) {
     const page = data.data
     state.name = page.name
     state.slug = page.slug
@@ -111,42 +111,42 @@ watch(pageData, (data) => {
     state.metaDescription = page.metaDescription || ""
     state.sections = page.sections || []
 
-    if (page.banner) {
+    if ( page.banner ) {
       bannerType.value = page.banner.type
       bannerState.value = { ...page.banner }
     }
   }
-}, { immediate: true })
+}, { immediate: true } )
 
 // Update banner state when type changes (manual change)
-watch(bannerType, (newType) => {
+watch( bannerType, ( newType ) => {
   // Only reset if user manually changed type
-  if (pageData.value?.data?.banner?.type !== newType) {
+  if ( pageData.value?.data?.banner?.type !== newType ) {
     bannerState.value = {
       type: newType,
-      ...generateDefaultState(bannerFieldsConfig[newType] || []),
+      ...generateDefaultState( bannerFieldsConfig[newType] || [] ),
     }
   }
-})
+} )
 
 // Add new section
-function addSection(type: SectionType) {
+function addSection( type: SectionType ) {
   const fields = sectionFieldsConfig[type] || []
-  state.sections.push({
+  state.sections.push( {
     type,
-    ...generateDefaultState(fields),
-  })
+    ...generateDefaultState( fields ),
+  } )
 }
 
 // Remove section
-function removeSection(index: number) {
-  state.sections.splice(index, 1)
+function removeSection( index: number ) {
+  state.sections.splice( index, 1 )
 }
 
 // Move section up/down
-function moveSection(index: number, direction: "up" | "down") {
+function moveSection( index: number, direction: "up" | "down" ) {
   const newIndex = direction === "up" ? index - 1 : index + 1
-  if (newIndex < 0 || newIndex >= state.sections.length) return
+  if ( newIndex < 0 || newIndex >= state.sections.length ) return
 
   const temp = state.sections[index]!
   state.sections[index] = state.sections[newIndex]!
@@ -154,18 +154,18 @@ function moveSection(index: number, direction: "up" | "down") {
 }
 
 // Update section data
-function updateSection(index: number, data: Record<string, unknown>) {
+function updateSection( index: number, data: Record<string, unknown> ) {
   state.sections[index] = { ...state.sections[index], ...data } as typeof state.sections[number]
 }
 
 // Get section type label
-function getSectionTypeLabel(type: SectionType): string {
-  return sectionTypes.find((t) => t.value === type)?.label || type
+function getSectionTypeLabel( type: SectionType ): string {
+  return sectionTypes.find( ( t ) => t.value === type )?.label || type
 }
 
 async function onSubmit() {
   // Validate banner fields first
-  if (bannerFormRef.value && !bannerFormRef.value.validate()) {
+  if ( bannerFormRef.value && !bannerFormRef.value.validate() ) {
     return // Stop submission if banner validation fails
   }
 
@@ -177,17 +177,17 @@ async function onSubmit() {
       banner: bannerState.value,
     }
 
-    await useNuxtApp().$api(`/api/pages/${pageId}`, {
-      method: "PUT",
-      body: payload,
-    })
+    await useNuxtApp().$api( `/api/pages/${pageId}`, {
+      method : "PUT",
+      body   : payload,
+    } )
 
-    toast.add({ title: "Sukses", description: "Halaman berhasil diperbarui", color: "success" })
-    router.push("/pages")
-  } catch (error: unknown) {
-    if (typeof error === "object" && error !== null && "data" in error) {
-      const err = (error as { data: ApiError }).data
-      toast.add({ title: "Gagal", description: err.error.message, color: "error" })
+    toast.add( { title: "Sukses", description: "Halaman berhasil diperbarui", color: "success" } )
+    router.push( "/pages" )
+  } catch ( error: unknown ) {
+    if ( typeof error === "object" && error !== null && "data" in error ) {
+      const err = ( error as { data: ApiError } ).data
+      toast.add( { title: "Gagal", description: err.error.message, color: "error" } )
     }
   } finally {
     isLoading.value = false
@@ -210,7 +210,12 @@ async function onSubmit() {
         <UIcon name="i-lucide-loader-2" class="animate-spin size-8" />
       </div>
 
-      <UForm v-else :state="formState" :schema="formSchema" class="space-y-6 max-w-4xl" :disabled="isLoading"
+      <UForm
+        v-else
+        :state="formState"
+        :schema="formSchema"
+        class="space-y-6 max-w-4xl"
+        :disabled="isLoading"
         @submit="onSubmit">
         <!-- Page Info -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -235,15 +240,20 @@ async function onSubmit() {
             <USelect v-model="bannerType" :items="bannerTypes" class="w-full" />
           </UFormField>
 
-          <DynamicForm ref="bannerFormRef" :fields="bannerFieldsConfig[bannerType] || []" :model-value="bannerState"
-            name-prefix="banner" @update:model-value="bannerState = $event" />
+          <DynamicForm
+            ref="bannerFormRef"
+            :fields="bannerFieldsConfig[bannerType] || []"
+            :model-value="bannerState"
+            name-prefix="banner"
+            @update:model-value="bannerState = $event" />
         </div>
 
         <!-- Sections -->
         <div class="space-y-4">
           <div class="flex items-center justify-between">
             <h3 class="font-medium">Sections</h3>
-            <UDropdownMenu :items="sectionTypes.map(t => ({ label: t.label, onSelect: () => addSection(t.value) }))"
+            <UDropdownMenu
+              :items="sectionTypes.map(t => ({ label: t.label, onSelect: () => addSection(t.value) }))"
               :content="{ align: 'end' }">
               <UButton size="sm" color="primary" icon="i-lucide-plus">
                 Tambah Section
@@ -252,14 +262,17 @@ async function onSubmit() {
           </div>
 
           <!-- Empty state -->
-          <div v-if="!state.sections.length"
+          <div
+            v-if="!state.sections.length"
             class="border border-dashed border-default rounded-lg p-8 text-center text-muted">
             <p class="mb-2">Belum ada section.</p>
             <p class="text-sm">Klik "Tambah Section" untuk menambahkan.</p>
           </div>
 
           <!-- Section list -->
-          <div v-for="(section, idx) in state.sections" :key="idx"
+          <div
+            v-for="(section, idx) in state.sections"
+            :key="idx"
             class="border border-default rounded-lg overflow-hidden">
             <!-- Section header -->
             <div class="flex items-center justify-between px-4 py-3 bg-muted/30">
@@ -268,22 +281,41 @@ async function onSubmit() {
                 <UBadge color="neutral" variant="subtle">{{ getSectionTypeLabel(section.type) }}</UBadge>
               </div>
               <div class="flex items-center gap-1">
-                <UButton size="xs" color="neutral" variant="ghost" icon="i-lucide-chevron-up" :disabled="idx === 0"
+                <UButton
+                  size="xs"
+                  color="neutral"
+                  variant="ghost"
+                  icon="i-lucide-chevron-up"
+                  :disabled="idx === 0"
                   @click="moveSection(idx, 'up')" />
-                <UButton size="xs" color="neutral" variant="ghost" icon="i-lucide-chevron-down"
-                  :disabled="idx === state.sections.length - 1" @click="moveSection(idx, 'down')" />
-                <UButton size="xs" color="error" variant="ghost" icon="i-lucide-trash-2" @click="removeSection(idx)" />
+                <UButton
+                  size="xs"
+                  color="neutral"
+                  variant="ghost"
+                  icon="i-lucide-chevron-down"
+                  :disabled="idx === state.sections.length - 1"
+                  @click="moveSection(idx, 'down')" />
+                <UButton
+                  size="xs"
+                  color="error"
+                  variant="ghost"
+                  icon="i-lucide-trash-2"
+                  @click="removeSection(idx)" />
               </div>
             </div>
 
             <!-- Section fields -->
             <div class="p-4">
-              <DynamicForm :fields="sectionFieldsConfig[section.type] || []" :model-value="section"
-                :name-prefix="`sections.${idx}`" @update:model-value="updateSection(idx, $event)" />
+              <DynamicForm
+                :fields="sectionFieldsConfig[section.type] || []"
+                :model-value="section"
+                :name-prefix="`sections.${idx}`"
+                @update:model-value="updateSection(idx, $event)" />
             </div>
           </div>
           <div class="flex items-center justify-center">
-            <UDropdownMenu :items="sectionTypes.map(t => ({ label: t.label, onSelect: () => addSection(t.value) }))"
+            <UDropdownMenu
+              :items="sectionTypes.map(t => ({ label: t.label, onSelect: () => addSection(t.value) }))"
               :content="{ align: 'end' }">
               <UButton size="sm" color="primary" icon="i-lucide-plus">
                 Tambah Section
@@ -307,8 +339,16 @@ async function onSubmit() {
 
         <!-- Actions -->
         <div class="flex justify-end gap-2 pt-4">
-          <UButton label="Batal" color="neutral" variant="outline" to="/pages" />
-          <UButton label="Simpan" color="neutral" type="submit" :loading="isLoading" />
+          <UButton
+            label="Batal"
+            color="neutral"
+            variant="outline"
+            to="/pages" />
+          <UButton
+            label="Simpan"
+            color="neutral"
+            type="submit"
+            :loading="isLoading" />
         </div>
       </UForm>
     </template>
