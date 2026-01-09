@@ -46,14 +46,7 @@ export function validateBannerData( type: BannerType, data: unknown ) {
  * Section Types (for embedded sections)
  */
 
-export const sectionTypeValues = [
-  "aboutUs",
-  "catalog",
-  "contactUs",
-  "quote",
-  "service",
-  "testimoni",
-] as const
+export const sectionTypeValues = sectionTypes.map( ( type ) => type.value )
 
 export const SectionTypeZod = z.enum( sectionTypeValues )
 
