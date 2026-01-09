@@ -65,6 +65,17 @@ export interface TestimoniSection {
   rating: number
 }
 
+// BodyCopy Section
+export interface BodyCopyItem {
+  content: string
+}
+
+export interface BodyCopySection {
+  type: "bodyCopy"
+  title: string
+  items: BodyCopyItem[]
+}
+
 // Discriminated Union for all Section types
 export type Section =
   | AboutUsSection

@@ -11,10 +11,19 @@ const emit = defineEmits<{
   blur: []
 }>()
 
-// Local value synced with modelValue
-const value = computed( {
-  get: () => props.modelValue || "",
-  set: ( val: string ) => emit( "update:modelValue", val ),
+// Use a local ref for better TipTap reactivity with empty strings
+const localValue = ref( props.modelValue ?? "" )
+
+// Sync from parent to local (when parent changes externally)
+watch( () => props.modelValue, ( newVal ) => {
+  if ( newVal !== localValue.value ) {
+    localValue.value = newVal ?? ""
+  }
+} )
+
+// Sync from local to parent (when user types)
+watch( localValue, ( newVal ) => {
+  emit( "update:modelValue", newVal )
 } )
 
 const items = [ [{
@@ -71,16 +80,18 @@ function handleBlur() {
 </script>
 
 <template>
-  <UEditor
-    v-slot="{ editor }"
-    v-model="value"
-    content-type="markdown"
-    :ui="{ base: 'p-2 sm:p-4' }"
-    class="w-full min-h-74 border border-muted rounded-lg bg-background"
-    @blur="handleBlur">
-    <UEditorToolbar
-      :editor="editor"
-      :items="items"
-      class="border-b border-muted py-2 px-2 sm:px-4 overflow-x-auto" />
-  </UEditor>
+  <ClientOnly>
+    <UEditor
+      v-slot="{ editor }"
+      v-model="localValue"
+      :content-type="localValue ? 'markdown' : undefined"
+      :ui="{ base: 'p-2 sm:p-4' }"
+      class="w-full min-h-74 border border-muted rounded-lg bg-background"
+      @blur="handleBlur">
+      <UEditorToolbar
+        :editor="editor"
+        :items="items"
+        class="border-b border-muted py-2 px-2 sm:px-4 overflow-x-auto" />
+    </UEditor>
+  </ClientOnly>
 </template>
