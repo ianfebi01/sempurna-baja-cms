@@ -227,6 +227,21 @@ function clearImage( fieldName: string ) {
           @blur="validateField(field.name)" />
       </UFormField>
 
+      <!-- Markdown Input -->
+      <UFormField
+        v-else-if="field.type === 'markdown'"
+        :label="field.label"
+        :name="getFieldPath(field.name)"
+        :required="field.required"
+        :error="fieldErrors[field.name]">
+        <Markdown
+          :model-value="(modelValue[field.name] as string) || ''"
+          :disabled="disabled"
+          class="w-full"
+          @update:model-value="updateField(field.name, $event)"
+          @blur="validateField(field.name)" />
+      </UFormField>
+
       <!-- Image Upload -->
       <UFormField
         v-else-if="field.type === 'image'"

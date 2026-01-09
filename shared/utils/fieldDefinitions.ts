@@ -7,7 +7,7 @@ import z from "zod"
 export interface FieldDefinition {
   name: string
   label: string
-  type: "text" | "textarea" | "image" | "number" | "url" | "array" | "icon"
+  type: "text" | "textarea" | "image" | "number" | "url" | "array" | "icon" | "markdown"
   required?: boolean
   default?: unknown
   min?: number
@@ -23,7 +23,7 @@ export interface FieldDefinition {
 export const bannerFieldsConfig: Record<string, FieldDefinition[]> = {
   mainHero: [
     { name: "title", label: "Judul", type: "text", required: true, placeholder: "Solusi Baja Ringan" },
-    { name: "subtitle", label: "Subtitle", type: "textarea", placeholder: "Material lengkap + jasa pemasangan" },
+    { name: "subtitle", label: "Subtitle", type: "text", placeholder: "Material lengkap + jasa pemasangan" },
     { name: "image", label: "Gambar", type: "image", required: true },
     { name: "imageTitle", label: "Judul Gambar", type: "text", required: true },
     { name: "imageSubtitle", label: "Subtitle Gambar", type: "text", required: true },
