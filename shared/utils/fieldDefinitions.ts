@@ -285,7 +285,6 @@ export const sectionTypes: { label: string; value: SectionType }[] = [
   { label: "Katalog Produk", value: "catalog" },
   { label: "Hubungi Kami", value: "contactUs" },
   { label: "Quote", value: "quote" },
-  { label: "Jasa / Layanan", value: "service" },
   { label: "Testimoni", value: "testimoni" },
   { label: "Body Copy", value: "bodyCopy" },
 ]
