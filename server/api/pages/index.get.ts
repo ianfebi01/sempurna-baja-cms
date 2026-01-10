@@ -10,8 +10,8 @@ export default defineApi( async ( event ) => {
   const pageSize = Number( query.pageSize ) || 20
   const search = String( query.search || "" ).trim()
   const slug = String( query.slug || "" ).trim()
-  const isPublished = String( query.isPublished || "" ).trim()
-  const isHomePage = String( query.isHomePage || "" ).trim()
+  const isPublished = String( query.published || "" ).trim()
+  const isHomePage = String( query.homePage || "" ).trim()
 
   const client = await clientPromise
   const db = client?.db( DB_NAME )
