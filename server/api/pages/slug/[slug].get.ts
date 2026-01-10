@@ -10,6 +10,7 @@ import { PAGE_COLLECTION } from "~~/server/models/page.schema"
 export default defineApi( async ( event ) => {
   const slug = getRouterParam( event, "slug" )
   const isPublished = getQuery( event ).published
+  const isHomePage = getQuery( event ).homePage
 
   if ( !slug ) {
     return fail( 400, "Slug wajib diisi", "BAD_REQUEST" )
@@ -18,10 +19,18 @@ export default defineApi( async ( event ) => {
   const client = await clientPromise
   const db = client!.db( DB_NAME )
 
-  const page = await db.collection( PAGE_COLLECTION ).findOne( {
-    slug        : slug.toLowerCase(),
-    isPublished : isPublished === "true",
-  } )
+  const query: Record<string, unknown> = { slug: slug.toLowerCase() }
+
+  if ( isPublished !== undefined ) {
+    query.isPublished = isPublished === "true"
+  }
+  if ( isHomePage !== undefined ) {
+    query.isHomePage = isHomePage === "true"
+  }
+
+  const page = await db.collection( PAGE_COLLECTION ).findOne( query )
+
+  console.log(page)
 
   if ( !page ) {
     return fail( 404, "Halaman tidak ditemukan", "NOT_FOUND" )
