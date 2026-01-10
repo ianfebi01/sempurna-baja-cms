@@ -187,7 +187,9 @@ const toast = useToast()
 const { user } = useUserSession()
 const isSuperAdmin = computed( () => user.value?.role === "super-admin" )
 
-// ==================== USERS SECTION ====================
+/**
+ * USERS SECTION
+ */
 
 interface UserItem { 
   _id: string
@@ -335,7 +337,9 @@ const userColumns: TableColumn<UserItem>[] = [
     },
 ]
 
-// ==================== ALLOWLIST SECTION ====================
+/**
+ * ALLOWLIST SECTION
+ */
 
 interface AllowItem { email: string; role: Role }
 

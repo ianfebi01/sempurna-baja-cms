@@ -17,62 +17,60 @@
     </template>
 
     <template #body>
-      <div class="flex flex-wrap items-center justify-between gap-1.5">
-        <UInput
-          :model-value="(table?.tableApi?.getColumn('name')?.getFilterValue() as string)"
-          class="max-w-sm"
-          icon="i-lucide-search"
-          placeholder="Filter produk..."
-          :ui="{trailing: 'pe-1'}"
-          :loading="status === 'pending'"
-          @update:model-value="table?.tableApi?.getColumn('name')?.setFilterValue($event)" >
-          <template v-if="(table?.tableApi?.getColumn('name')?.getFilterValue() as string)?.length" #trailing>
-            <UButton
-              color="neutral"
-              variant="link"
-              size="sm"
-              icon="i-lucide-circle-x"
-              aria-label="Clear input"
-              @click="(table?.tableApi?.getColumn('name')?.setFilterValue(''))"
-            />
-          </template>
-        </UInput>
-
-        <div class="flex flex-wrap items-center gap-1.5">
-          <USelect
-            v-model="categoryFilter"
-            :items="categories"
-            :loading="categoriesPending"
-            :ui="{ trailingIcon: 'group-data-[state=open]:rotate-180 transition-transform duration-200' }"
-            placeholder="Filter kategori"
-            class="min-w-28" />
-          <UDropdownMenu
-            :items="table?.tableApi
-              ?.getAllColumns()
-              .filter((column: any) => column.getCanHide())
-              .map((column: any) => ({
-                label: upperFirst(column.id),
-                type: 'checkbox' as const,
-                checked: column.getIsVisible(),
-                onUpdateChecked(checked: boolean) {
-                  table?.tableApi?.getColumn(column.id)?.toggleVisibility(!!checked)
-                },
-                onSelect(e?: Event) {
-                  e?.preventDefault()
-                }
-              }))
-            "
-            :content="{ align: 'end' }">
-            <UButton
-              label="Display"
-              color="neutral"
-              variant="outline"
-              trailing-icon="i-lucide-settings-2" />
-          </UDropdownMenu>
-        </div>
-      </div>
-
       <ClientOnly>
+        <div class="flex flex-wrap items-center justify-between gap-1.5">
+          <UInput
+            :model-value="(table?.tableApi?.getColumn('name')?.getFilterValue() as string)"
+            class="max-w-sm"
+            icon="i-lucide-search"
+            placeholder="Filter produk..."
+            :ui="{ trailing: 'pe-1' }"
+            :loading="status === 'pending'"
+            @update:model-value="table?.tableApi?.getColumn('name')?.setFilterValue($event)">
+            <template v-if="(table?.tableApi?.getColumn('name')?.getFilterValue() as string)?.length" #trailing>
+              <UButton
+                color="neutral"
+                variant="link"
+                size="sm"
+                icon="i-lucide-circle-x"
+                aria-label="Clear input"
+                @click="(table?.tableApi?.getColumn('name')?.setFilterValue(''))" />
+            </template>
+          </UInput>
+          <div class="flex flex-wrap items-center gap-1.5">
+            <USelect
+              v-model="categoryFilter"
+              :items="categories"
+              :loading="categoriesPending"
+              :ui="{ trailingIcon: 'group-data-[state=open]:rotate-180 transition-transform duration-200' }"
+              placeholder="Filter kategori"
+              class="min-w-28" />
+            <UDropdownMenu
+              :items="table?.tableApi
+                ?.getAllColumns()
+                .filter((column: any) => column.getCanHide())
+                .map((column: any) => ({
+                  label: upperFirst(column.id),
+                  type: 'checkbox' as const,
+                  checked: column.getIsVisible(),
+                  onUpdateChecked(checked: boolean) {
+                    table?.tableApi?.getColumn(column.id)?.toggleVisibility(!!checked)
+                  },
+                  onSelect(e?: Event) {
+                    e?.preventDefault()
+                  }
+                }))
+              "
+              :content="{ align: 'end' }">
+              <UButton
+                label="Display"
+                color="neutral"
+                variant="outline"
+                trailing-icon="i-lucide-settings-2" />
+            </UDropdownMenu>
+          </div>
+        </div>
+
         <UTable
           ref="table"
           v-model:column-filters="columnFilters"
@@ -81,7 +79,7 @@
           v-model:pagination="pagination"
           :pagination-options="{
             getPaginationRowModel: getPaginationRowModel(),
-            manualPagination:true
+            manualPagination: true
           }"
           :column-filters-options="{
             manualFiltering: true
@@ -176,7 +174,7 @@ const { data, status } = await useAPI<ApiSuccess<ProductResponse>>( "/api/produc
     search   : computed( () => columnFiltersDebounced.value.find( ( filter ) => filter.id === "name" )?.value || "" ),
     category : computed( () => columnFiltersDebounced.value.find( ( filter ) => filter.id === "category" )?.value || "" ),
   },
-  watch: [ pagination, columnFiltersDebounced ],
+  watch: [pagination, columnFiltersDebounced],
 } )
 
 const rows = computed( () => data.value?.data?.data || [] )
@@ -410,4 +408,3 @@ function promptDeleteProduct( product: Product ) {
   showDeleteConfirm.value = true
 }
 </script>
-
