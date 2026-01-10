@@ -30,8 +30,6 @@ export default defineApi( async ( event ) => {
 
   const page = await db.collection( PAGE_COLLECTION ).findOne( query )
 
-  console.log(page)
-
   if ( !page ) {
     return fail( 404, "Halaman tidak ditemukan", "NOT_FOUND" )
   }

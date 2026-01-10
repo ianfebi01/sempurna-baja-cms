@@ -37,8 +37,6 @@ export function validateBannerData( type: BannerType, data: unknown ) {
   const dynamicSchema = generateZodSchema( fields )
   const fullSchema = BaseBannerZod.merge( dynamicSchema )
 
-  console.log( fullSchema )
-
   return fullSchema.safeParse( data )
 }
 
