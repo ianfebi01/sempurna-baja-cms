@@ -10,7 +10,8 @@ export default defineApi( async ( event ) => {
   const pageSize = Number( query.pageSize ) || 20
   const search = String( query.search || "" ).trim()
   const slug = String( query.slug || "" ).trim()
-  const published = query.published
+  const isPublished = String( query.isPublished || "" ).trim()
+  const isHomePage = String( query.isHomePage || "" ).trim()
 
   const client = await clientPromise
   const db = client?.db( DB_NAME )
@@ -35,10 +36,16 @@ export default defineApi( async ( event ) => {
     filter.$or = orConditions
   }
 
-  if ( published === "true" ) {
+  if ( isPublished === "true" ) {
     filter.isPublished = true
-  } else if ( published === "false" ) {
+  } else if ( isPublished === "false" ) {
     filter.isPublished = false
+  }
+
+  if ( isHomePage === "true" ) {
+    filter.isHomePage = true
+  } else if ( isHomePage === "false" ) {
+    filter.isHomePage = false
   }
 
   const total = await db?.collection( PAGE_COLLECTION ).countDocuments( filter )
