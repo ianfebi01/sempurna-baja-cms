@@ -81,6 +81,14 @@ export default defineApi( async ( event ) => {
     return fail( 409, `Slug "${slug}" sudah ada`, "CONFLICT" )
   }
 
+  // If setting as homepage, unset any existing homepage first (excluding current page)
+  if ( parsed.data.isHomePage ) {
+    await db.collection( PAGE_COLLECTION ).updateMany(
+      { isHomePage: true, _id: { $ne: new ObjectId( id ) } },
+      { $set: { isHomePage: false } },
+    )
+  }
+
   // Sections are now embedded directly
   const updateDoc = {
     name            : parsed.data.name,
