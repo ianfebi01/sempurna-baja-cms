@@ -206,8 +206,12 @@ async function onSubmit() {
     </template>
 
     <template #body>
-      <div v-if="pageStatus === 'pending'" class="flex items-center justify-center py-8">
-        <UIcon name="i-lucide-loader-2" class="animate-spin size-8" />
+      <div v-if="pageStatus === 'pending'" class="flex items-center justify-center py-8 my-auto">
+        <UIcon name="i-lucide-loader-2" class="animate-spin size-8!" />
+      </div>
+      <div v-else-if="pageStatus === 'error'" class="flex flex-col items-center justify-center py-8 my-auto">
+        <UIcon name="i-lucide-triangle-alert" class="text-red-500 size-8!" />
+        <p>Terjadi kesalahan saat memuat data halaman</p>
       </div>
 
       <UForm
