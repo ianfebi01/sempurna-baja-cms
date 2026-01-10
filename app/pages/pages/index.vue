@@ -171,6 +171,15 @@ const columns: TableColumn<PageListItem>[] = [
       }, () => row.original.isPublished ? "Diterbitkan" : "Draft" ),
   },
   {
+    accessorKey : "isHomePage",
+    header      : "Beranda",
+    cell        : ( { row } ) =>
+      h( UBadge, {
+        color   : row.original.isHomePage ? "success" : "neutral",
+        variant : "subtle",
+      }, () => row.original.isHomePage ? "Ya" : "Tidak" ),
+  },
+  {
     accessorKey : "createdAt",
     header      : "Dibuat",
     cell        : ( { row } ) => new Date( row.original.createdAt ).toLocaleDateString( "id-ID" ),

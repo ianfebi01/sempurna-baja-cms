@@ -53,6 +53,7 @@ export default defineApi( async ( event ) => {
       name        : 1,
       slug        : 1,
       isPublished : 1,
+      isHomePage  : 1,
       createdAt   : 1,
       updatedAt   : 1,
     } )

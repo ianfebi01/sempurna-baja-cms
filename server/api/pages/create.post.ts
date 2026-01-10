@@ -71,6 +71,7 @@ export default defineApi( async ( event ) => {
     banner          : parsed.data.banner,
     sections        : parsed.data.sections, // Embedded sections
     isPublished     : parsed.data.isPublished,
+    isHomePage      : parsed.data.isHomePage,
     metaTitle       : parsed.data.metaTitle,
     metaDescription : parsed.data.metaDescription,
     createdAt       : new Date(),

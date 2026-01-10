@@ -30,6 +30,7 @@ const { data: pageData, status: pageStatus } = await useAPI<ApiSuccess<{
   name: string
   slug: string
   isPublished: boolean
+  isHomePage: boolean
   metaTitle?: string
   metaDescription?: string
   banner: { type: BannerType;[key: string]: unknown }
@@ -47,6 +48,7 @@ const state = reactive( {
   name            : "",
   slug            : "",
   isPublished     : false,
+  isHomePage      : false,
   metaTitle       : "",
   metaDescription : "",
   sections        : [] as Array<{ type: SectionType;[key: string]: unknown }>,
@@ -107,6 +109,7 @@ watch( pageData, ( data ) => {
     state.name = page.name
     state.slug = page.slug
     state.isPublished = page.isPublished
+    state.isHomePage = page.isHomePage
     state.metaTitle = page.metaTitle || ""
     state.metaDescription = page.metaDescription || ""
     state.sections = page.sections || []
@@ -234,6 +237,10 @@ async function onSubmit() {
 
         <UFormField label="Status" name="isPublished">
           <UCheckbox v-model="state.isPublished" label="Diterbitkan" />
+        </UFormField>
+
+        <UFormField label="Baranda" name="isHomePage">
+          <UCheckbox v-model="state.isHomePage" label="Halaman Beranda" />
         </UFormField>
 
         <!-- Banner -->

@@ -102,6 +102,7 @@ export const PageZod = z.object( {
   banner          : z.object( { type: BannerTypeZod } ).passthrough(), // Embedded banner with dynamic fields
   sections        : z.array( z.object( { type: SectionTypeZod } ).passthrough() ), // Embedded sections with dynamic fields
   isPublished     : z.boolean().default( false ),
+  isHomePage      : z.boolean().default( false ),
   metaTitle       : z.string().optional(),
   metaDescription : z.string().optional(),
 } )
@@ -121,6 +122,7 @@ export interface PageDocument {
     [key: string]: unknown
   }>
   isPublished: boolean
+  isHomePage: boolean
   metaTitle?: string
   metaDescription?: string
   createdAt: Date

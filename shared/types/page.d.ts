@@ -131,6 +131,7 @@ export interface Page {
   banner: Banner
   sections: Section[]
   isPublished: boolean
+  isHomePage: boolean
   metaTitle?: string
   metaDescription?: string
   createdAt: string
@@ -142,6 +143,7 @@ export interface PageListItem {
   name: string
   slug: string
   isPublished: boolean
+  isHomePage: boolean
   createdAt: string
   updatedAt: string
 }

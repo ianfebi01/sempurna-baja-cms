@@ -30,6 +30,7 @@ const state = reactive( {
   name            : "",
   slug            : "",
   isPublished     : false,
+  isHomePage      : false,
   metaTitle       : "",
   metaDescription : "",
   banner          : {
@@ -85,6 +86,7 @@ const formSchema = computed( () => z.object( {
   name            : z.string().min( 1, "Nama halaman wajib diisi" ),
   slug            : z.string().min( 1, "Slug wajib diisi" ).regex( /^[a-z0-9-]+$/, "Slug hanya boleh berisi huruf kecil, angka, dan tanda hubung" ),
   isPublished     : z.boolean(),
+  isHomePage      : z.boolean(),
   metaTitle       : z.string().optional().or( z.literal( "" ) ),
   metaDescription : z.string().optional().or( z.literal( "" ) ),
   banner          : bannerSchema.value.optional(),
@@ -182,6 +184,10 @@ async function onSubmit() {
 
         <UFormField label="Status" name="isPublished">
           <UCheckbox v-model="state.isPublished" label="Diterbitkan" />
+        </UFormField>
+
+        <UFormField label="Baranda" name="isHomePage">
+          <UCheckbox v-model="state.isHomePage" label="Halaman Beranda" />
         </UFormField>
 
         <!-- Banner -->
